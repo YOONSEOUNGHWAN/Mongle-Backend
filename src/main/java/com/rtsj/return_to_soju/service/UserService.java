@@ -1,8 +1,8 @@
-package com.rtsj.return_to_soju.domain.user.service;
+package com.rtsj.return_to_soju.service;
 
-import com.rtsj.return_to_soju.domain.user.entity.User;
-import com.rtsj.return_to_soju.domain.user.entity.dto.RequestSignupDto;
-import com.rtsj.return_to_soju.domain.user.repository.UserRepository;
+import com.rtsj.return_to_soju.model.entity.User;
+import com.rtsj.return_to_soju.model.dto.RequestSignupDto;
+import com.rtsj.return_to_soju.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
