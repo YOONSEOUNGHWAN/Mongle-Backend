@@ -45,6 +45,11 @@ jobs:
         docker build -t ppyooy336/docker:${GITHUB_SHA::7} .
         docker push ppyooy336/docker:${GITHUB_SHA::7}
         
+    - name: echo
+      run: |
+        echo ${{ secrets.SERVER_KEY }}
+        echo ${{ secrets.SERVER_HOST }}
+        
     - name: SSH Remote Commands
       uses: appleboy/ssh-action@v0.1.4
       with:
