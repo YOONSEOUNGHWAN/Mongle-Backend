@@ -1,12 +1,13 @@
-package com.rtsj.return_to_soju.domain.user.entity;
+package com.rtsj.return_to_soju.model.entity;
 
-import com.rtsj.return_to_soju.domain.base.BaseEntity;
-import com.rtsj.return_to_soju.domain.base.Role;
+import com.rtsj.return_to_soju.model.enums.Role;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -43,6 +44,9 @@ public class User extends BaseEntity {
 
     @Column(name = "last_update")
     private LocalDateTime lastUpdate;
+
+    @OneToMany(mappedBy = "user")
+    private List<Calender> calenderList = new ArrayList<>();
 
     public User(String name, String kakaoName, String password) {
         this.name = name;

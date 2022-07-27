@@ -1,7 +1,7 @@
-package com.rtsj.return_to_soju.domain.user.controller;
+package com.rtsj.return_to_soju.controller;
 
-import com.rtsj.return_to_soju.domain.user.entity.dto.RequestSignupDto;
-import com.rtsj.return_to_soju.domain.user.service.UserService;
+import com.rtsj.return_to_soju.model.dto.RequestSignupDto;
+import com.rtsj.return_to_soju.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

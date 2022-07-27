@@ -1,7 +1,7 @@
 package com.rtsj.return_to_soju.common.config.auth;
 
-import com.rtsj.return_to_soju.domain.user.entity.User;
-import com.rtsj.return_to_soju.domain.user.repository.UserRepository;
+import com.rtsj.return_to_soju.model.entity.User;
+import com.rtsj.return_to_soju.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

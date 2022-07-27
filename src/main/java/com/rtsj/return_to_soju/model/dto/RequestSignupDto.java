@@ -1,6 +1,6 @@
-package com.rtsj.return_to_soju.domain.user.entity.dto;
+package com.rtsj.return_to_soju.model.dto;
 
-import com.rtsj.return_to_soju.domain.user.entity.User;
+import com.rtsj.return_to_soju.model.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
