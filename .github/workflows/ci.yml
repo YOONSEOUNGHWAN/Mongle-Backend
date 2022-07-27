@@ -33,7 +33,7 @@ jobs:
         mkdir resources
         cd ./resources
         touch ./application.properties
-        echo "${{ secrets.PROPERTIES_PROD }}" > ./application.properties
+        echo "${{ secrets.PROPERTIES }}" > ./application.properties
       shell: bash    
     
     - name: Build with Gradle
