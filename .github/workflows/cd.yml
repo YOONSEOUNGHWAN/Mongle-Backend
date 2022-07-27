@@ -53,9 +53,9 @@ jobs:
         key: ${{ secrets.SERVER_KEY }}
         envs: GITHUB_SHA
         script: |
-          docker pull ppyooy336/dku_council:${GITHUB_SHA::7}
-          docker tag ppyooy336/dku_council:${GITHUB_SHA::7} dku_council
+          docker pull ppyooy336/docker:${GITHUB_SHA::7}
+          docker tag ppyooy336/docker:${GITHUB_SHA::7} docker
           docker stop server
-          docker run -d --rm --name server -p 8080:8080 dku_council
+          docker run -d --rm --name server -p 8080:8080 docker
         
   
