@@ -39,6 +39,8 @@ jobs:
 #       with:
 #         arguments: build
 
+    - name: echo
+      run: echo ${{ secrets.SERVER_KEY }}
     
     - name: SSH Remote Commands
       uses: appleboy/ssh-action@v0.1.4
