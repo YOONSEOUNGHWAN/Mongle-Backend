@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class CalenderController {
 
+    // 만들까 말까~
+//    @GetMapping("/calender/{calenderId}")
 
     @Operation(
             summary = "월 별 캘린더 데이터 조회 api",
