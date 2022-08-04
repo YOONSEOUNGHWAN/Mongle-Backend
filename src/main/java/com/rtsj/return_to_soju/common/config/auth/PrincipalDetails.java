@@ -1,5 +1,5 @@
 package com.rtsj.return_to_soju.common.config.auth;
-import com.rtsj.return_to_soju.domain.user.entity.User;
+import com.rtsj.return_to_soju.model.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;

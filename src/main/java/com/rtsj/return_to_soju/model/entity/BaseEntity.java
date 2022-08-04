@@ -1,4 +1,4 @@
-package com.rtsj.return_to_soju.domain.base;
+package com.rtsj.return_to_soju.model.entity;
 
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
