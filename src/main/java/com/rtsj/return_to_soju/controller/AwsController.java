@@ -1,7 +1,6 @@
 package com.rtsj.return_to_soju.controller;
 
 import com.rtsj.return_to_soju.model.dto.request.UploadKakaoTextDto;
-import com.rtsj.return_to_soju.service.AwsService;
 import com.rtsj.return_to_soju.service.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,7 +30,7 @@ public class AwsController {
             content = @Content(schema = @Schema(implementation = List.class)))
     )
     @PostMapping("/s3/kakao")
-    public List<String> test(@ModelAttribute UploadKakaoTextDto dto) {
+    public List<String> uploadKakaoText(@ModelAttribute UploadKakaoTextDto dto) {
         List<String> strings = s3Service.uploadFile(dto.getFiles());
         return strings;
     }
