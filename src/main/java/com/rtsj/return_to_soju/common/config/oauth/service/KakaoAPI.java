@@ -3,6 +3,7 @@ package com.rtsj.return_to_soju.common.config.oauth.service;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.rtsj.return_to_soju.exception.BaseException;
+import com.rtsj.return_to_soju.model.dto.GetUserInfoByKakaoDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -66,6 +67,45 @@ public class KakaoAPI {
         }
 
         return accessToken;
+    }
+
+    public GetUserInfoByKakaoDto getKakaoUserInfo(String token) {
+        String reqURL = "https://kapi.kakao.com/v2/user/me";
+
+        GetUserInfoByKakaoDto returnDto = new GetUserInfoByKakaoDto();
+
+        try {
+            URL url = new URL(reqURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Authorization", "Bearer " + token); //전송할 header 작성, access_token전송
+
+            if (conn.getResponseCode() != 200) {
+                // 필요할까?
+                throw new IOException();
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String line = "";
+            String result = "";
+
+            while ((line = br.readLine()) != null) {
+                result += line;
+            }
+
+            JsonElement element = JsonParser.parseString(result);
+
+            Long id = element.getAsJsonObject().get("id").getAsLong();
+            String nickname = element.getAsJsonObject().get("properties").getAsJsonObject().get("nickname").getAsString();
+            String name = element.getAsJsonObject().get("name").getAsString();
+
+            returnDto.setAllData(id, nickname, name);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return returnDto;
     }
 
     public void createKakaoUser(String token) throws BaseException {
