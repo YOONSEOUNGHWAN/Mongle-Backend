@@ -14,7 +14,5 @@ public class RequestSignupDto{
 
     private String password;
 
-    public User toUserEntity(){
-        return new User(userName, kakaoName, password);
-    }
+
 }

@@ -20,7 +20,7 @@ public class Oauth2Controller {
         String accessToken = kakaoAPI.getAccessToken(code);
         kakaoAPI.createKakaoUser(accessToken);
         kakaoAPI.unlinkKakaoUser(accessToken);
-        return code;
+        return "성공!";
     }
 
 

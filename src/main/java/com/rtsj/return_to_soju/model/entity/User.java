@@ -17,7 +17,7 @@ import java.util.List;
 @ToString
 @Table(name = "RTUser")
 public class User extends BaseEntity {
-    @Id @GeneratedValue
+    @Id
     @Column(name = "user_id")
     private Long id;
 
@@ -25,13 +25,11 @@ public class User extends BaseEntity {
 
     private String kakaoName;
 
-    private String password;
-
     private String phone;
 
-    private String birthday;
+    private String kakaoAccessToken;
 
-    private Character sex;
+    private String kakaoRefreshToken;
 
     @Column(name = "email_cloud")
     private String cloudEmail;
@@ -48,9 +46,18 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private List<Calender> calenderList = new ArrayList<>();
 
-    public User(String name, String kakaoName, String password) {
+    public User(Long id, String name, String kakaoName) {
+        this.id = id;
         this.name = name;
         this.kakaoName = kakaoName;
-        this.password = password;
+    }
+
+    public void updateKakaoName(String kakaoName) {
+        this.kakaoName = kakaoName;
+    }
+
+    public void updateKakaoTokens(String kakaoAccessToken, String kakaoRefreshToken) {
+        this.kakaoAccessToken = kakaoAccessToken;
+        this.kakaoRefreshToken = kakaoRefreshToken;
     }
 }
