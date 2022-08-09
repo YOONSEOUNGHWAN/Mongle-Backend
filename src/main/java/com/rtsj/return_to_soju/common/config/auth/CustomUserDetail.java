@@ -16,11 +16,11 @@ import java.util.Collection;
 //나중에 메모리에서 띄워 줄거임.
 
 
-public class PrincipalDetails implements UserDetails {
+public class CustomUserDetail implements UserDetails {
 
     private User user; // 콜포지션
 
-    public  PrincipalDetails(User user){
+    public CustomUserDetail(User user){
         this.user = user;
     }
 

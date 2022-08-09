@@ -14,7 +14,7 @@ import java.util.Optional;
 //
 @Service
 @RequiredArgsConstructor
-public class PrincipalDetailsService implements UserDetailsService {
+public class CustomUserDetailService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
@@ -23,10 +23,12 @@ public class PrincipalDetailsService implements UserDetailsService {
     //session(authentication)으로 등록된다.. //이렇게 권한을 확인할 수 있음.
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        Optional<User> optionalUser = userRepository.findById(Long.valueOf(userId));
-        if(optionalUser.isPresent()){
-            return new PrincipalDetails(optionalUser.orElseThrow(() -> new UsernameNotFoundException("not found")));
+        Optional<User> optionalUser = userRepository.findById(Long.parseLong(userId));
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            return new CustomUserDetail(user);
         }
         return null;
     }
 }
+

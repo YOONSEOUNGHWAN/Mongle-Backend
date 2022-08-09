@@ -1,6 +1,8 @@
 package com.rtsj.return_to_soju.common.config;
 
 //import com.rtsj.return_to_soju.common.config.oauth.PrincipalOauth2UserService;
+import com.rtsj.return_to_soju.common.JwtProvider;
+import com.rtsj.return_to_soju.common.config.auth.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
@@ -18,7 +21,7 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig{
 
     private final CorsFilter corsFilter; //cors 정책 벗어남
-
+    private final JwtProvider jwtProvider;
 //    private final PrincipalOauth2UserService principalOauth2UserService;
 
     @Bean
@@ -33,8 +36,10 @@ public class SecurityConfig{
                 .authorizeRequests()
                 .antMatchers("/api/**").permitAll()
                 .antMatchers("/join").permitAll()
+//                .antMatchers("/api/test").hasRole("USER")
                 .anyRequest().permitAll()
                 .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();
 
     }

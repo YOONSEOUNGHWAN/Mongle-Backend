@@ -2,9 +2,11 @@ package com.rtsj.return_to_soju.controller;
 
 import com.rtsj.return_to_soju.model.dto.RequestSignupDto;
 import com.rtsj.return_to_soju.model.dto.request.SignupUserDto;
+import com.rtsj.return_to_soju.model.dto.response.BothTokenResponseDto;
 import com.rtsj.return_to_soju.model.entity.User;
 import com.rtsj.return_to_soju.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,10 +26,17 @@ public class UserController {
 //        return "회원가입완료";
 //    }
 
-    @PostMapping("/users")
-    public void join(@RequestBody SignupUserDto dto) {
-        User user = userService.signup(dto);
+    @Secured("ROLE_USER")
+    @GetMapping("/test")
+    public String test(){
+        return "pass";
+    }
 
+    @PostMapping("/users")
+    public BothTokenResponseDto join(@RequestBody SignupUserDto dto) {
+        BothTokenResponseDto response = userService.signup(dto);
+
+        return response;
     }
 
 

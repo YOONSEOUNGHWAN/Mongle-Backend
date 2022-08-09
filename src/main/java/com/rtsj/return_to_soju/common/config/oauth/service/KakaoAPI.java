@@ -99,9 +99,8 @@ public class KakaoAPI {
 
             Long id = element.getAsJsonObject().get("id").getAsLong();
             String nickname = element.getAsJsonObject().get("properties").getAsJsonObject().get("nickname").getAsString();
-            String name = element.getAsJsonObject().get("name").getAsString();
 
-            returnDto.setAllData(id, nickname, name);
+            returnDto.setAllData(id, nickname);
         } catch (IOException e) {
             e.printStackTrace();
         }

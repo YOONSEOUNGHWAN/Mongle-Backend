@@ -46,9 +46,8 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private List<Calender> calenderList = new ArrayList<>();
 
-    public User(Long id, String name, String kakaoName) {
+    public User(Long id, String kakaoName) {
         this.id = id;
-        this.name = name;
         this.kakaoName = kakaoName;
     }
 
@@ -59,5 +58,9 @@ public class User extends BaseEntity {
     public void updateKakaoTokens(String kakaoAccessToken, String kakaoRefreshToken) {
         this.kakaoAccessToken = kakaoAccessToken;
         this.kakaoRefreshToken = kakaoRefreshToken;
+    }
+
+    public void makeRole(Role role) {
+        this.role = role;
     }
 }
