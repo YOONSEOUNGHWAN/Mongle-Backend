@@ -1,87 +1,83 @@
 package com.rtsj.return_to_soju.common;
 
-import com.rtsj.return_to_soju.common.config.auth.CustomUserDetailService;
+
+import com.rtsj.return_to_soju.common.auth.CustomJwtUserDetailsService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Random;
 
-@Slf4j
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class JwtProvider {
+    private final CustomJwtUserDetailsService customUserDetailsService;
+    @Value("${jwt.access-token.expire-length}")
+    private long accessTokenValidityInMilliseconds;
+    @Value("${jwt.refresh-token.expire-length}")
+    private long refreshTokenValidityInMilliseconds;
+    @Value("${jwt.token.secret-key}")
+    private String secretKey;
 
-    private final CustomUserDetailService customUserDetailService;
-
-    private String secretKey = "hihi";
-
-    private final Long accessTokenValidMillisecond = 24 * 60 * 60 * 1000L; // 1day
-    private final Long refreshTokenValidMillisecond = Long.MAX_VALUE;
-
-    @PostConstruct
-    protected void init(){
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+    public String createAccessToken(String payload){
+        return createToken(payload, accessTokenValidityInMilliseconds);
     }
 
-    public String createAccessToken(Long userId) {
-        Claims claims = Jwts.claims();
-        claims.setSubject(userId.toString());
+    public String createRefreshToken(){
+        byte[] array = new byte[7];
+        new Random().nextBytes(array);
+        String generatedString = new String(array, StandardCharsets.UTF_8);
+        return createToken(generatedString, refreshTokenValidityInMilliseconds);
+    }
 
+    public String createToken(String payload, long expireLength){
+        Claims claims = Jwts.claims().setSubject(payload);
         Date now = new Date();
+        Date validity = new Date(now.getTime() + expireLength);
         return Jwts.builder()
-                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date((now.getTime() + accessTokenValidMillisecond)))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .setExpiration(validity)
+                .signWith(SignatureAlgorithm.HS256,secretKey)
                 .compact();
     }
 
-    public String createRefreshToken(Long userId) {
-        Claims claims = Jwts.claims();
-        claims.setSubject(userId.toString());
-
-        Date now = new Date();
-        return Jwts.builder()
-                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(new Date((now.getTime() + refreshTokenValidMillisecond)))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
+    public String getPayload(String token){
+        try{
+            return Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        }catch (ExpiredJwtException e){
+            return e.getClaims().getSubject();
+        }catch (JwtException e){
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
     }
 
     public boolean validateToken(String token){
-        try {
-            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return !claimsJws.getBody().getExpiration().before(new Date()); // 만료 날짜가 현재보다 이전이면 False
-        } catch (JwtException | IllegalArgumentException e) {
-            log.error(e.toString());
+        try{
+            Jws<Claims> claimsJws = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token);
+            return !claimsJws.getBody().getExpiration().before(new Date());
+        }catch (JwtException | IllegalArgumentException exception){
             return false;
         }
     }
 
-    private Claims parseClaim(String token){
-        try {
-            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
+    public Authentication getAuthentication(String token){
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(this.getPayload(token));
+        return new UsernamePasswordAuthenticationToken(userDetails,"",userDetails.getAuthorities());
     }
 
-    public String getUserId(String token) {
-        return parseClaim(token).getSubject();
-    }
-
-    public Authentication getAuthentication(String token) {
-        UserDetails userDetails = customUserDetailService.loadUserByUsername(this.getUserId(token));
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-    }
 }

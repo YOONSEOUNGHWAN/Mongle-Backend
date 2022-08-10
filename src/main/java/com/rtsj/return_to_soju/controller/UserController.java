@@ -1,7 +1,7 @@
 package com.rtsj.return_to_soju.controller;
 
-import com.rtsj.return_to_soju.model.dto.common.UserToken;
-import com.rtsj.return_to_soju.model.dto.response.LoginResponse;
+import com.rtsj.return_to_soju.model.dto.dto.KakaoTokenDto;
+import com.rtsj.return_to_soju.model.dto.response.LoginResponseDto;
 import com.rtsj.return_to_soju.service.OauthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,14 +26,14 @@ public class UserController {
     @Operation(summary = "로그인 API", description = "카카오 access & refresh 토큰을 사용한 회원가입 및 로그인 입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK !!",
-                    content = @Content(schema = @Schema(implementation = LoginResponse.class)))
+                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class)))
     })
-    @GetMapping("/login/{provider}")
-    public ResponseEntity<LoginResponse> loginWithKakao(@Parameter(name = "provide", description = "플랫폼(kakao)", in = ParameterIn.PATH)
+    @PostMapping("/login/{provider}")
+    public ResponseEntity<LoginResponseDto> loginWithKakao(@Parameter(name = "kakao", description = "플랫폼(kakao)", in = ParameterIn.PATH)
                                                         @PathVariable String provider,
-                                                        @RequestBody UserToken userToken){
-        LoginResponse loginResponse = oauthService.loginWithToken(provider, userToken);
-        return ResponseEntity.ok().body(loginResponse);
+                                                           @RequestBody KakaoTokenDto kakaoTokenDto){
+        LoginResponseDto loginResponseDto = oauthService.loginWithToken(provider, kakaoTokenDto);
+        return ResponseEntity.ok().body(loginResponseDto);
     }
 
 }

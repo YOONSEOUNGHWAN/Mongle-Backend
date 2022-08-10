@@ -1,6 +1,6 @@
 package com.rtsj.return_to_soju.common.auth.jwt;
 
-import com.rtsj.return_to_soju.common.JwtTokenProvider;
+import com.rtsj.return_to_soju.common.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,12 +14,12 @@ import java.io.IOException;
 // 따라서 해당 필터를 등록해줘야 로그인 할 때 필터가 걸림.
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends GenericFilter {
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtProvider jwtProvider;
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         String token = resolveToken((HttpServletRequest) request);
-        if(jwtTokenProvider.validateToken(token)){
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+        if(jwtProvider.validateToken(token)){
+            Authentication authentication = jwtProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         chain.doFilter(request, response);

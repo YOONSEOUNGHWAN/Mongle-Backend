@@ -1,6 +1,6 @@
 package com.rtsj.return_to_soju.config;
 
-import com.rtsj.return_to_soju.common.JwtTokenProvider;
+import com.rtsj.return_to_soju.common.JwtProvider;
 import com.rtsj.return_to_soju.common.auth.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +18,7 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig{
 
     private final CorsFilter corsFilter;
-    private final JwtTokenProvider jwtProvider;
+    private final JwtProvider jwtProvider;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         return http

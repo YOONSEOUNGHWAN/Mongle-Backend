@@ -1,4 +1,4 @@
-package com.rtsj.return_to_soju.model.dto.common;
+package com.rtsj.return_to_soju.model.dto.dto;
 
 import java.util.Map;
 
