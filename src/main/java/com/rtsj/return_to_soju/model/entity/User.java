@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "RTUSER")
 @Getter
+@DynamicUpdate //상속 받는다고 어노테이션까지 상속은 안되더라...
 public class User extends BaseEntity{
     @Id
     @Column(name = "user_id")
