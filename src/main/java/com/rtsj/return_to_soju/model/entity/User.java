@@ -3,6 +3,7 @@ package com.rtsj.return_to_soju.model.entity;
 import com.rtsj.return_to_soju.model.enums.Role;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "RTUSER")
 @Getter
-public class User extends BaseEntity{
+public class User extends BaseEntity implements Persistable<Long> {
     @Id
     @Column(name = "user_id")
     private Long id; //katalk PK 값으로 매핑하기
@@ -52,5 +53,8 @@ public class User extends BaseEntity{
         this.kakaoRefreshToken = kakaoRefreshToken;
     }
 
-
+    @Override
+    public boolean isNew() {
+        return getCreateDate() == null;
+    }
 }
