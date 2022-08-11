@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Random;
@@ -78,6 +79,12 @@ public class JwtProvider {
     public Authentication getAuthentication(String token){
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(this.getPayload(token));
         return new UsernamePasswordAuthenticationToken(userDetails,"",userDetails.getAuthorities());
+    }
+
+    public Long getUserIdByToken(HttpServletRequest request) {
+        String token = request.getHeader("X-AUTH-TOKEN");
+        String userId = this.getPayload(token);
+        return Long.parseLong(userId);
     }
 
 }
