@@ -35,6 +35,15 @@ jobs:
         touch ./application.properties
         echo "${{ secrets.PROPERTIES }}" > ./application.properties
       shell: bash    
+      
+    - name: make test properties
+      run: |
+        cd ./src/test
+        mkdir resources
+        cd ./resources
+        touch ./application.properties
+        echo "${{ secrets.TEST_PROPERTIES }}" > ./application.properties
+      shell: bash    
     
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
