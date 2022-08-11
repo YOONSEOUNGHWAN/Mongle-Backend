@@ -17,6 +17,7 @@ public class ControllerAdvice {
             IllegalArgumentException.class,
             WebClientResponseException.class,
             NotFoundUserException.class,
+            UserNotFoundByIdException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ErrorResponseResult exceptionHandler(HttpServletRequest request, Exception e) {

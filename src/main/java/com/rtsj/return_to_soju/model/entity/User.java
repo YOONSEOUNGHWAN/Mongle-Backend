@@ -4,6 +4,7 @@ import com.rtsj.return_to_soju.model.dto.dto.KakaoTokenDto;
 import com.rtsj.return_to_soju.model.enums.Role;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,7 +16,7 @@ import java.util.List;
 @Table(name = "RTUSER")
 @Getter
 @DynamicUpdate //상속 받는다고 어노테이션까지 상속은 안되더라...
-public class User extends BaseEntity{
+public class User extends BaseEntity implements Persistable<Long> {
     @Id
     @Column(name = "user_id")
     private Long id; //katalk PK 값으로 매핑하기
@@ -51,6 +52,12 @@ public class User extends BaseEntity{
     }
     public void updateKakaoRefreshToken(String kakaoRefreshToken){
         this.kakaoRefreshToken = kakaoRefreshToken;
+    }
+
+
+    @Override
+    public boolean isNew() {
+        return getCreateDate() == null;
     }
 
     public void updateKakaoAccessToken(String kakaoAccessToken){

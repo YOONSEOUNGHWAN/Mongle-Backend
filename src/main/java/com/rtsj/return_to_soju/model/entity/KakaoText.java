@@ -3,14 +3,11 @@ package com.rtsj.return_to_soju.model.entity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class KakaoText extends BaseEntity{
+public class KakaoText extends BaseEntity {
 
     @Id
     @GeneratedValue
@@ -20,5 +17,13 @@ public class KakaoText extends BaseEntity{
     @Column(name = "kakao_url")
     private String url;
 
+    @ManyToOne()
+    @JoinColumn(name = "userId")
+    private User user;
     //OneToMany -> DailySentence 생략
+
+    public KakaoText(String url, User user) {
+        this.url = url;
+        this.user = user;
+    }
 }
