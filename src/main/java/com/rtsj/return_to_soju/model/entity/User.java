@@ -42,8 +42,6 @@ public class User extends BaseEntity implements Persistable<Long> {
         this.kakaoRefreshToken = kakaoRefreshToken;
         this.role = role;
     }
-
-
     public void setKakaoUpdate(){
         this.kakaoUpdate = LocalDateTime.now();
     }
@@ -54,14 +52,11 @@ public class User extends BaseEntity implements Persistable<Long> {
         this.kakaoRefreshToken = kakaoRefreshToken;
     }
 
-
+    public void updateKakaoAccessToken(String kakaoAccessToken){
+        this.kakaoAccessToken = kakaoAccessToken;
+    }
     @Override
     public boolean isNew() {
         return getCreateDate() == null;
     }
-
-    public void updateKakaoAccessToken(String kakaoAccessToken){
-        this.kakaoAccessToken = kakaoAccessToken;
-    }
-
 }

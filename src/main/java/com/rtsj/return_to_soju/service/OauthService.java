@@ -42,7 +42,6 @@ public class OauthService {
         String refreshToken = jwtProvider.createRefreshToken();
         return new LoginResponseDto(user, accessToken, refreshToken);
     }
-    @Transactional
 
     private Map<String, Object> getKakaoUserAttributesWithToken(KakaoTokenDto kakaoTokenDto) throws WebClientResponseException {
         return WebClient.create()
@@ -63,7 +62,6 @@ public class OauthService {
         if(optionalUser.isPresent()){
             User existUser = optionalUser.get();
             existUser.updateNickName(nickName);
-            System.out.println("이미존");
             existUser.updateKakaoAccessToken(kakaoTokenDto.getAccessToken());
             existUser.updateKakaoRefreshToken(kakaoTokenDto.getRefreshToken());
             return existUser;

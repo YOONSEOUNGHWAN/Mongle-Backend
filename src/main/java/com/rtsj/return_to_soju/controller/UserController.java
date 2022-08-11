@@ -34,4 +34,13 @@ public class UserController {
         return ResponseEntity.ok().body(loginResponseDto);
     }
 
+    /**
+     * 로그인 요청시마다 client가 귀찮을 수도 있으니, 기존 refresh로 access 만료되면 받아서 사용하기
+     */
+    @PostMapping("/renew/kakao")
+    public String renewAccessToken(@RequestBody String token){
+        KakaoTokenDto kakaoTokenDto = oauthService.renewKakaoToken(token);
+        return kakaoTokenDto.getAccessToken();
+    }
+
 }
