@@ -27,7 +27,6 @@ public class S3Service {
 
     public List<String> uploadFile(List<MultipartFile> files) {
         List<String> fileNameList = new ArrayList<>();
-
         files.stream()
                 .forEach(file -> {
                     String fileName = UUID.randomUUID().toString();
@@ -44,7 +43,6 @@ public class S3Service {
 
                     fileNameList.add(fileName);
                 });
-
         return fileNameList;
     }
 }
