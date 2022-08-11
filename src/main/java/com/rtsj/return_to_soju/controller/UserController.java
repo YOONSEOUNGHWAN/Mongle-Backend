@@ -28,11 +28,9 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "OK !!",
                     content = @Content(schema = @Schema(implementation = LoginResponseDto.class)))
     })
-    @PostMapping("/login/{provider}")
-    public ResponseEntity<LoginResponseDto> loginWithKakao(@Parameter(name = "kakao", description = "플랫폼(kakao)", in = ParameterIn.PATH)
-                                                        @PathVariable String provider,
-                                                           @RequestBody KakaoTokenDto kakaoTokenDto){
-        LoginResponseDto loginResponseDto = oauthService.loginWithToken(provider, kakaoTokenDto);
+    @PostMapping("/login/kakao")
+    public ResponseEntity<LoginResponseDto> loginWithKakao(@RequestBody KakaoTokenDto kakaoTokenDto){
+        LoginResponseDto loginResponseDto = oauthService.loginWithKakaoToken(kakaoTokenDto);
         return ResponseEntity.ok().body(loginResponseDto);
     }
 

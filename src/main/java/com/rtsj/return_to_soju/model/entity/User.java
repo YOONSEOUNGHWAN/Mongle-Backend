@@ -1,5 +1,6 @@
 package com.rtsj.return_to_soju.model.entity;
 
+import com.rtsj.return_to_soju.model.dto.dto.KakaoTokenDto;
 import com.rtsj.return_to_soju.model.enums.Role;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -31,7 +32,7 @@ public class User extends BaseEntity{
     @OneToMany(mappedBy = "user")
     private List<Calender> calenderList = new ArrayList<>();
 
-    public User(Long id, String name, String nickName, String kakaoAccessToken, String kakaoRefreshToken, Role role){
+    public User(Long id, String name, String nickName, String kakaoAccessToken, String kakaoRefreshToken,  Role role){
         this.id = id;
         this.name = name;
         this.nickName = nickName;
@@ -47,10 +48,12 @@ public class User extends BaseEntity{
     public void updateNickName(String nickName){
         this.nickName = nickName;
     }
-    public void setKakaoToken(String kakaoAccessToken, String kakaoRefreshToken){
-        this.kakaoAccessToken = kakaoAccessToken;
+    public void updateKakaoRefreshToken(String kakaoRefreshToken){
         this.kakaoRefreshToken = kakaoRefreshToken;
     }
 
+    public void updateKakaoAccessToken(String kakaoAccessToken){
+        this.kakaoAccessToken = kakaoAccessToken;
+    }
 
 }

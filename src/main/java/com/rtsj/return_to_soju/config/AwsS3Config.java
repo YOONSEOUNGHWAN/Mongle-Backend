@@ -29,5 +29,4 @@ public class AwsS3Config {
                 .build();
     }
 
-
 }

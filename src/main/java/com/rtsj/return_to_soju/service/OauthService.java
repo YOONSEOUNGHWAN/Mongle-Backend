@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,14 +28,14 @@ public class OauthService {
     private final JwtProvider jwtProvider;
 
     @Transactional
-    public LoginResponseDto loginWithToken(String providerName, KakaoTokenDto kakaoTokenDto) {
-        User user = getUserProfileByToken(providerName, kakaoTokenDto);
+    public LoginResponseDto loginWithKakaoToken(KakaoTokenDto kakaoTokenDto) {
+        User user = createAndUpdateKakaoUserProfileWithToken(kakaoTokenDto);
         String accessToken = jwtProvider.createAccessToken(String.valueOf(user.getId()));
         String refreshToken = jwtProvider.createRefreshToken();
         return new LoginResponseDto(user, accessToken, refreshToken);
     }
 
-    private Map<String, Object> getUserAttributesByToken(KakaoTokenDto kakaoTokenDto) throws WebClientResponseException {
+    private Map<String, Object> getKakaoUserAttributesWithToken(KakaoTokenDto kakaoTokenDto) throws WebClientResponseException {
         return WebClient.create()
                 .get()
                 .uri("https://kapi.kakao.com/v2/user/me")
@@ -44,21 +45,28 @@ public class OauthService {
                 .block();
     }
 
-    private User getUserProfileByToken(String providerName, KakaoTokenDto kakaoTokenDto){
-        if(!providerName.equals("kakao")){
-            throw new IllegalArgumentException("잘못된 접근입니다.");
-        }
-        Map<String, Object> userAttributesByToken = getUserAttributesByToken(kakaoTokenDto);
-        KakaoUserInfo kakaoUserInfo = new KakaoUserInfo(userAttributesByToken);
+    private User createAndUpdateKakaoUserProfileWithToken(KakaoTokenDto kakaoTokenDto){
+        KakaoUserInfo kakaoUserInfo = getKakaoUserInfoWithToken(kakaoTokenDto);
         Long kakao_id = kakaoUserInfo.getId();
         String name = kakaoUserInfo.getName();
         String nickName = kakaoUserInfo.getNickName();
-        if(userRepository.findById(kakao_id).isPresent()){
-            throw new DuplicateSignInException();
+        Optional<User> optionalUser = userRepository.findById(kakao_id);
+        if(optionalUser.isPresent()){
+            User existUser = optionalUser.get();
+            existUser.updateNickName(nickName);
+            existUser.updateKakaoAccessToken(kakaoTokenDto.getAccessToken());
+            existUser.updateKakaoRefreshToken(kakaoTokenDto.getRefreshToken());
+            return existUser;
         }
         User user = new User(kakao_id, name, nickName, kakaoTokenDto.getAccessToken(), kakaoTokenDto.getRefreshToken(), Role.ROLE_USER);
         User save = userRepository.save(user);
         return save;
+    }
+
+    private KakaoUserInfo getKakaoUserInfoWithToken(KakaoTokenDto kakaoTokenDto) {
+        Map<String, Object> userAttributesByToken = getKakaoUserAttributesWithToken(kakaoTokenDto);
+        KakaoUserInfo kakaoUserInfo = new KakaoUserInfo(userAttributesByToken);
+        return kakaoUserInfo;
     }
 
 }
