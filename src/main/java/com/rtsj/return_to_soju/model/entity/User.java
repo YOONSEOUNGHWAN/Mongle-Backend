@@ -10,47 +10,47 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter
-@DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@ToString
-@Table(name = "RTUser")
-public class User extends BaseEntity {
-    @Id @GeneratedValue
+@Table(name = "RTUSER")
+@Getter
+public class User extends BaseEntity{
+    @Id
     @Column(name = "user_id")
-    private Long id;
-
+    private Long id; //katalk PK 값으로 매핑하기
     private String name;
-
-    private String kakaoName;
-
-    private String password;
-
-    private String phone;
-
-    private String birthday;
-
-    private Character sex;
-
-    @Column(name = "email_cloud")
+    private String nickName;
+    private String kakaoAccessToken;
+    private String kakaoRefreshToken;
     private String cloudEmail;
-
+    private String calenderEmail;
     @Enumerated(EnumType.STRING)
-    private Role role; // ROLE_USER, ROLE_ADMIN
+    private Role role;
 
-    @Column(name = "email_calendar")
-    private String calendarEmail;
-
-    @Column(name = "last_update")
-    private LocalDateTime lastUpdate;
-
+    @Column(name = "kakao_update")
+    private LocalDateTime kakaoUpdate;
     @OneToMany(mappedBy = "user")
     private List<Calender> calenderList = new ArrayList<>();
 
-    public User(String name, String kakaoName, String password) {
+    public User(Long id, String name, String nickName, String kakaoAccessToken, String kakaoRefreshToken, Role role){
+        this.id = id;
         this.name = name;
-        this.kakaoName = kakaoName;
-        this.password = password;
+        this.nickName = nickName;
+        this.kakaoAccessToken = kakaoAccessToken;
+        this.kakaoRefreshToken = kakaoRefreshToken;
+        this.role = role;
     }
+
+
+    public void setKakaoUpdate(){
+        this.kakaoUpdate = LocalDateTime.now();
+    }
+    public void updateNickName(String nickName){
+        this.nickName = nickName;
+    }
+    public void setKakaoToken(String kakaoAccessToken, String kakaoRefreshToken){
+        this.kakaoAccessToken = kakaoAccessToken;
+        this.kakaoRefreshToken = kakaoRefreshToken;
+    }
+
+
 }

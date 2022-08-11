@@ -1,26 +1,39 @@
 package com.rtsj.return_to_soju.controller;
 
-import com.rtsj.return_to_soju.model.dto.RequestSignupDto;
-import com.rtsj.return_to_soju.service.UserService;
+import com.rtsj.return_to_soju.model.dto.dto.KakaoTokenDto;
+import com.rtsj.return_to_soju.model.dto.response.LoginResponseDto;
+import com.rtsj.return_to_soju.service.OauthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "USER", description = "로그인 API")
+@RequiredArgsConstructor
+@Slf4j
 @RestController
 @RequestMapping("/api")
-@RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
-
-    @GetMapping("/test")
-    public String test(){
-        return "test";
+    private final OauthService oauthService;
+    @Operation(summary = "로그인 API", description = "카카오 access & refresh 토큰을 사용한 회원가입 및 로그인 입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK !!",
+                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class)))
+    })
+    @PostMapping("/login/{provider}")
+    public ResponseEntity<LoginResponseDto> loginWithKakao(@Parameter(name = "kakao", description = "플랫폼(kakao)", in = ParameterIn.PATH)
+                                                        @PathVariable String provider,
+                                                           @RequestBody KakaoTokenDto kakaoTokenDto){
+        LoginResponseDto loginResponseDto = oauthService.loginWithToken(provider, kakaoTokenDto);
+        return ResponseEntity.ok().body(loginResponseDto);
     }
-
-    @PostMapping("/join")
-    public String join(@RequestBody RequestSignupDto dto){
-        userService.signup(dto);
-        return "회원가입완료";
-    }
-
 
 }

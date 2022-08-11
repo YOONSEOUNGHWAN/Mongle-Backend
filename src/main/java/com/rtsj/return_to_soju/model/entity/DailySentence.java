@@ -1,11 +1,13 @@
 package com.rtsj.return_to_soju.model.entity;
 
+import com.rtsj.return_to_soju.model.enums.Emotion;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DailySentence extends BaseEntity {
     @Id
     @GeneratedValue
@@ -15,6 +17,9 @@ public class DailySentence extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "calender_id")
     private Calender calender;
+    private String sentence;
+    @Enumerated(EnumType.STRING)
+    private Emotion emotion;
 
     private String roomName;
 
@@ -22,5 +27,4 @@ public class DailySentence extends BaseEntity {
     @JoinColumn(name="kakao_id")
     private KakaoText kakaoText;
 
-    private String sentence;
 }

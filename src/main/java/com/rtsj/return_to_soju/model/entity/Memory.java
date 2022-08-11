@@ -1,11 +1,12 @@
 package com.rtsj.return_to_soju.model.entity;
 
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Memory {
 
     @Id
