@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "로그인 정보")
+@Schema(description = "회원가입 및 로그인 응답")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoginResponseDto {
