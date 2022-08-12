@@ -4,7 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.rtsj.return_to_soju.exception.UserNotFoundByIdException;
+import com.rtsj.return_to_soju.exception.NotFoundUserException;
 import com.rtsj.return_to_soju.model.entity.KakaoText;
 import com.rtsj.return_to_soju.model.entity.User;
 import com.rtsj.return_to_soju.repository.KakaoTextRepository;
@@ -62,7 +62,7 @@ public class S3Service {
     @Transactional
     public void uploadKakaoFile(List<MultipartFile> files, Long userId) {
         // 이 에러가 발생할 확률이 사실상 없지만 만약 발생하게 된다면 400번으로 나가는데 이게 옳을까..?
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundByIdException::new);
+        User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
         String prefix = user.getId() + "-" + user.getNickName() + "-";
 
         List<String> urls = this.uploadFile(files, prefix);

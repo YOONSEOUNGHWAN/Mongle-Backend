@@ -5,7 +5,9 @@ import com.rtsj.return_to_soju.exception.NotFoundUserException;
 import com.rtsj.return_to_soju.model.dto.dto.KakaoRenewInfo;
 import com.rtsj.return_to_soju.model.dto.dto.KakaoUserInfo;
 import com.rtsj.return_to_soju.model.dto.dto.KakaoTokenDto;
+import com.rtsj.return_to_soju.model.dto.request.ReissueTokenRequestDto;
 import com.rtsj.return_to_soju.model.dto.response.LoginResponseDto;
+import com.rtsj.return_to_soju.model.dto.response.ReissueTokenResponseDto;
 import com.rtsj.return_to_soju.model.entity.User;
 import com.rtsj.return_to_soju.model.enums.Role;
 import com.rtsj.return_to_soju.repository.UserRepository;
@@ -43,6 +45,19 @@ public class OauthService {
         return new LoginResponseDto(user, accessToken, refreshToken);
     }
 
+    /**
+     * 단순히 refresh token으로 access토큰을 갱신하는 과정이며(refresh가 만료됐을 시, refresh도 재발급해준다.)
+     * 이를 사용할 때, 유저의 id값에서 세팅을 다시 해줘야 한다.
+     *
+     */
+    public ReissueTokenResponseDto renewKakaoToken(String kakaoRefreshToken){
+        KakaoRenewInfo renewKakaoToken = getRenewKakaoToken(kakaoRefreshToken);
+        String accessToken = renewKakaoToken.getAccessToken();
+        String refreshToken = renewKakaoToken.getRefreshToken();
+        ReissueTokenResponseDto kakaoTokenDto = new ReissueTokenResponseDto(accessToken, refreshToken);
+        return kakaoTokenDto;
+    }
+
     private Map<String, Object> getKakaoUserAttributesWithToken(KakaoTokenDto kakaoTokenDto) throws WebClientResponseException {
         return WebClient.create()
                 .get()
@@ -77,13 +92,6 @@ public class OauthService {
         return kakaoUserInfo;
     }
 
-    public KakaoTokenDto renewKakaoToken(String kakaoRefreshToken){
-        KakaoRenewInfo renewKakaoToken = getRenewKakaoToken(kakaoRefreshToken);
-        String accessToken = renewKakaoToken.getAccessToken();
-        String refreshToken = renewKakaoToken.getRefreshToken();
-        KakaoTokenDto kakaoTokenDto = new KakaoTokenDto(accessToken, refreshToken);
-        return kakaoTokenDto;
-    }
 
     private KakaoRenewInfo getRenewKakaoToken(String kakaoRefreshToken){
         Map<String, Object> kakaoRenewResponse = getKakaoRenewResponse(kakaoRefreshToken);
