@@ -67,6 +67,6 @@ jobs:
           docker pull ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_REPOSITORY }}:${GITHUB_SHA::7}
           docker tag ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_REPOSITORY }}:${GITHUB_SHA::7} mongle-backend
           docker stop mongle-backend
-          docker run -d --rm --name server -p 8080:8080 mongle-backend
+          docker run -d --rm --name mongle-backend -p 8080:8080 mongle-backend
 
   
