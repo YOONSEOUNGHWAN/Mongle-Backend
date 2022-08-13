@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "RTUSER")
 @Getter
+@DynamicUpdate //상속 받는다고 어노테이션까지 상속은 안되더라...
 public class User extends BaseEntity implements Persistable<Long> {
     @Id
     @Column(name = "user_id")
@@ -41,8 +42,6 @@ public class User extends BaseEntity implements Persistable<Long> {
         this.kakaoRefreshToken = kakaoRefreshToken;
         this.role = role;
     }
-
-
     public void setKakaoUpdate(){
         this.kakaoUpdate = LocalDateTime.now();
     }
@@ -53,14 +52,11 @@ public class User extends BaseEntity implements Persistable<Long> {
         this.kakaoRefreshToken = kakaoRefreshToken;
     }
 
-
+    public void updateKakaoAccessToken(String kakaoAccessToken){
+        this.kakaoAccessToken = kakaoAccessToken;
+    }
     @Override
     public boolean isNew() {
         return getCreateDate() == null;
     }
-
-    public void updateKakaoAccessToken(String kakaoAccessToken){
-        this.kakaoAccessToken = kakaoAccessToken;
-    }
-
 }

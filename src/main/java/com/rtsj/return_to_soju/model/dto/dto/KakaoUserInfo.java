@@ -2,21 +2,23 @@ package com.rtsj.return_to_soju.model.dto.dto;
 
 import java.util.Map;
 
-public class KakaoUserInfo extends Oauth2UserInfo {
-    public KakaoUserInfo(Map<String, Object> attributes) {
-        super(attributes);
+public class KakaoUserInfo{
+    protected Map<String, Object> attributes;
+
+    public KakaoUserInfo(Map<String, Object> attributes){
+        this.attributes = attributes;
     }
-    @Override
+    public Map<String, Object> getAttributes(){
+        return attributes;
+    }
     public Long getId() {
         return Long.parseLong(String.valueOf(attributes.get("id")));
     }
 
-    @Override
     public String getName() {
         return (String) getKakaoAccount().get("name");
     }
 
-    @Override
     public String getNickName() {
         return (String) getProfile().get("nickname");
     }
@@ -31,5 +33,4 @@ public class KakaoUserInfo extends Oauth2UserInfo {
     public String getProvider(){
         return "kakao";
     }
-
 }
