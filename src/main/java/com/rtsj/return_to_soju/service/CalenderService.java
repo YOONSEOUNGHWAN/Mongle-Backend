@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class CalenderService {
     private final CalenderRepository calenderRepository;
     private final UserRepository userRepository;
+    @Transactional //User의 정보를 가져오는데 사용됨.. 추가로, UserRepository에서 캘린더를 빼오면 어떨까... 성능측면에서는 비슷해 보이는뎅..
     public List<CalenderBetweenMonthResponseDto> findEmotionBetweenMonth(Long userId, String year, String start, String end) {
         int parseYear = Integer.parseInt(year);
         int startMonth = Integer.parseInt(start);
