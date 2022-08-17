@@ -32,4 +32,11 @@ public class Calender extends BaseEntity {
     private List<DailyTopic> topicList = new ArrayList<>();
     @OneToMany(mappedBy = "calender")
     private List<ImageFile> imageList = new ArrayList<>();
+
+    public Calender(User user, LocalDate date) {
+        this.user = user;
+        this.date = date;
+
+        user.addCalender(this);
+    }
 }
