@@ -1,10 +1,12 @@
 package com.rtsj.return_to_soju.controller;
 
+import com.rtsj.return_to_soju.common.JwtProvider;
 import com.rtsj.return_to_soju.model.dto.request.WriteDiaryDto;
 import com.rtsj.return_to_soju.model.dto.response.CalenderByDayDto;
-import com.rtsj.return_to_soju.model.dto.response.CalenderByMonthDto;
+import com.rtsj.return_to_soju.model.dto.response.CalenderBetweenMonthResponseDto;
 import com.rtsj.return_to_soju.model.dto.response.SentenceByEmotionWithDayDto;
 import com.rtsj.return_to_soju.model.enums.Emotion;
+import com.rtsj.return_to_soju.service.CalenderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,15 +14,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Tag(name = "Calender Controller", description = "Calender controller desc")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api")
 public class CalenderController {
 
     // 만들까 말까~
 //    @GetMapping("/calender/{calenderId}")
+    private final CalenderService calenderService;
+    private final JwtProvider jwtProvider;
 
     @Operation(
             summary = "월 별 캘린더 데이터 조회 api",
@@ -28,16 +38,20 @@ public class CalenderController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "요청 성공",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = CalenderByMonthDto.class))))
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = CalenderBetweenMonthResponseDto.class))))
     })
-    @GetMapping("/calender/{year}/{month}")
-    public String getCalenderByMonth(
+    @GetMapping("/calender/{year}/{start}/{end}")
+    public ResponseEntity<List<CalenderBetweenMonthResponseDto>> getCalenderByMonth(
+            HttpServletRequest request,
             @PathVariable(name = "year") String year,
-            @PathVariable(name = "month") String month
-    ) {
-
-        return null;
+            @PathVariable(name = "start") String start,
+            @PathVariable(name = "end") String end) {
+        Long userId = jwtProvider.getUserIdByToken(request);
+        List<CalenderBetweenMonthResponseDto> emotionBetweenMonth = calenderService.findEmotionBetweenMonth(userId, year, start, end);
+        return ResponseEntity.ok().body(emotionBetweenMonth);
     }
+
+
 
     @Operation(
             summary = "일 별 캘린더 데이터 조회 api",

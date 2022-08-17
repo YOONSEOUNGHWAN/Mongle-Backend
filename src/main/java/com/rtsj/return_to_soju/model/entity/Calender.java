@@ -2,6 +2,7 @@ package com.rtsj.return_to_soju.model.entity;
 
 import com.rtsj.return_to_soju.model.enums.Emotion;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Calender extends BaseEntity {
     @Id
@@ -36,7 +38,8 @@ public class Calender extends BaseEntity {
     public Calender(User user, LocalDate date) {
         this.user = user;
         this.date = date;
-
         user.addCalender(this);
     }
+
+
 }
