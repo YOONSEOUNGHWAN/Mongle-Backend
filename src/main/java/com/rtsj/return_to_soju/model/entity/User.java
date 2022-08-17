@@ -59,4 +59,8 @@ public class User extends BaseEntity implements Persistable<Long> {
     public boolean isNew() {
         return getCreateDate() == null;
     }
+
+    public void addCalender(Calender calender) {
+        this.calenderList.add(calender);
+    }
 }
