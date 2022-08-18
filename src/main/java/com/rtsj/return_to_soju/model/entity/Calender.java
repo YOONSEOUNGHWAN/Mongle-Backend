@@ -35,6 +35,13 @@ public class Calender extends BaseEntity {
     @OneToMany(mappedBy = "calender")
     private List<ImageFile> imageList = new ArrayList<>();
 
+    private Integer happy;
+    private Integer neutral;
+    private Integer angry;
+    private Integer anxios;
+    private Integer tired;
+    private Integer sad;
+
     public Calender(User user, LocalDate date) {
         this.user = user;
         this.date = date;
@@ -44,6 +51,5 @@ public class Calender extends BaseEntity {
     public void writeOrUpdateDiary(String diary) {
         this.diary = diary;
     }
-
 
 }

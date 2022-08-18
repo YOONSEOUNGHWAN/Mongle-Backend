@@ -76,7 +76,7 @@ public class CalenderController {
 
 
     @Operation(
-            summary = "일기 작성 or 수정 api",
+            summary = "일기 작성 or 수정 api (완료)",
             description = "path variable로 필요한 년도, 월, 일(22/07/26)을 입력 받은 후 body로 일기 내용을 입력받아 일기를 작성한다."
     )
     @ApiResponses(

@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 @Data
 public class KakaoMLData {
-    private String time;
+    private String date_time;
     private String text;
     private Emotion emotion;
 }
