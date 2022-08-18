@@ -41,5 +41,9 @@ public class Calender extends BaseEntity {
         user.addCalender(this);
     }
 
+    public void writeOrUpdateDiary(String diary) {
+        this.diary = diary;
+    }
+
 
 }

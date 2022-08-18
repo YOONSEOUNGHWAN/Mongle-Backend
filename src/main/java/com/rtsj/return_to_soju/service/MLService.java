@@ -29,6 +29,7 @@ public class MLService {
     private final CalenderRepository calenderRepository;
     private final UserRepository userRepository;
     private final DailySentenceRepository dailySentenceRepository;
+    private final CalenderService calenderService;
 
     public void saveKakaoMLData(KakaoMLDataSaveRequestDto dto) {
         Long userId = dto.getUserId();
@@ -41,7 +42,9 @@ public class MLService {
                 .forEach(data -> {
                     String time = data.getTime();
                     LocalDateTime localDateTime = convertStringTimeToLocalDateTimeFormat(time);
-                    Calender calender = this.findCalenderByUserAndLocalDate(user, localDateTime);
+                    LocalDate localDate = localDateTime.toLocalDate();
+
+                    Calender calender = calenderService.findCalenderByUserAndLocalDate(user, localDate);
 
                     String sentence = data.getText();
                     Emotion emotion = data.getEmotion();
@@ -56,16 +59,7 @@ public class MLService {
                 });
     }
 
-    private Calender findCalenderByUserAndLocalDate(User user, LocalDateTime localDateTime) {
-        LocalDate localDate = localDateTime.toLocalDate();
-        Optional<Calender> optionalCalender = calenderRepository.findByUserAndDate(user, localDate);
 
-        if (optionalCalender.isEmpty()) {
-            Calender calender = new Calender(user, localDate);
-            return calenderRepository.save(calender);
-        }
-        return optionalCalender.get();
-    }
 
     private LocalDateTime convertStringTimeToLocalDateTimeFormat(String origin) {
         StringTokenizer st = new StringTokenizer(origin);

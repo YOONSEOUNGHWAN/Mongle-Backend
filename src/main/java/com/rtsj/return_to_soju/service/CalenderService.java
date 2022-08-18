@@ -2,6 +2,7 @@ package com.rtsj.return_to_soju.service;
 
 import com.rtsj.return_to_soju.exception.NotFoundUserException;
 import com.rtsj.return_to_soju.model.dto.response.CalenderBetweenMonthResponseDto;
+import com.rtsj.return_to_soju.model.entity.Calender;
 import com.rtsj.return_to_soju.model.entity.User;
 import com.rtsj.return_to_soju.repository.CalenderRepository;
 import com.rtsj.return_to_soju.repository.UserRepository;
@@ -10,8 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,4 +43,25 @@ public class CalenderService {
         return responseDtoList;
     }
 
+    @Transactional
+    public void createDiary(Long userId, String year, String month, String day, String diaryText) {
+        String date = year + "-" + month + "-" + day;
+        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
+        User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
+
+        Calender calender = findCalenderByUserAndLocalDate(user, localDate);
+
+        calender.writeOrUpdateDiary(diaryText);
+        calenderRepository.save(calender);
+    }
+
+    public Calender findCalenderByUserAndLocalDate(User user, LocalDate localDate) {
+        Optional<Calender> optionalCalender = calenderRepository.findByUserAndDate(user, localDate);
+
+        if (optionalCalender.isEmpty()) {
+            Calender calender = new Calender(user, localDate);
+            return calenderRepository.save(calender);
+        }
+        return optionalCalender.get();
+    }
 }

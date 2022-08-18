@@ -1,9 +1,10 @@
 package com.rtsj.return_to_soju.controller;
 
 import com.rtsj.return_to_soju.common.JwtProvider;
+import com.rtsj.return_to_soju.common.SuccessResponseResult;
 import com.rtsj.return_to_soju.model.dto.request.WriteDiaryDto;
-import com.rtsj.return_to_soju.model.dto.response.CalenderByDayDto;
 import com.rtsj.return_to_soju.model.dto.response.CalenderBetweenMonthResponseDto;
+import com.rtsj.return_to_soju.model.dto.response.CalenderByDayDto;
 import com.rtsj.return_to_soju.model.dto.response.SentenceByEmotionWithDayDto;
 import com.rtsj.return_to_soju.model.enums.Emotion;
 import com.rtsj.return_to_soju.service.CalenderService;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
 import java.util.List;
 
 @Tag(name = "Calender Controller", description = "Calender controller desc")
@@ -46,7 +48,7 @@ public class CalenderController {
             @PathVariable(name = "year") String year,
             @RequestParam(value = "start") String start,
             @RequestParam(value = "end") String end) {
-        Long userId = jwtProvider.getUserIdByToken(request);
+        Long userId = jwtProvider.getUserIdByHeader(request);
         List<CalenderBetweenMonthResponseDto> emotionBetweenMonth = calenderService.findEmotionBetweenMonth(userId, year, start, end);
         return ResponseEntity.ok().body(emotionBetweenMonth);
     }
@@ -74,7 +76,7 @@ public class CalenderController {
 
 
     @Operation(
-            summary = "일기 작성 api",
+            summary = "일기 작성 or 수정 api",
             description = "path variable로 필요한 년도, 월, 일(22/07/26)을 입력 받은 후 body로 일기 내용을 입력받아 일기를 작성한다."
     )
     @ApiResponses(
@@ -83,14 +85,21 @@ public class CalenderController {
             }
     )
     @PostMapping("/calender/{year}/{month}/{day}/diary")
-    public String writeDiary(
+    public ResponseEntity<SuccessResponseResult> writeDiary(
             @PathVariable(name = "year") String year,
             @PathVariable(name = "month") String month,
             @PathVariable(name = "day") String day,
-            @RequestBody WriteDiaryDto dto
+            @RequestBody WriteDiaryDto dto,
+            HttpServletRequest request
     ) {
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        String diaryText = dto.getText();
+        calenderService.createDiary(userId, year, month, day, diaryText);
 
-        return null;
+        String uri = "/calender/" + year + "/" + month + "/" + day + "/diary";
+        return ResponseEntity
+                .created(URI.create(uri))
+                .body(new SuccessResponseResult("일기 등록 완료"));
     }
 
     @Operation(
