@@ -34,11 +34,11 @@ public class S3Service {
     private final UserRepository userRepository;
     private final KakaoTextRepository kakaoTextRepository;
 
-    public List<String> uploadFile(List<MultipartFile> files, String prefix) {
+    public List<String> uploadFile(List<MultipartFile> files, String prefix, String dirname) {
         List<String> fileNameList = new ArrayList<>();
         files.stream()
                 .forEach(file -> {
-                    String fileName = prefix + UUID.randomUUID();
+                    String fileName = dirname + "/" + prefix + UUID.randomUUID();
                     ObjectMetadata objectMetadata = new ObjectMetadata();
                     objectMetadata.setContentLength(file.getSize());
                     objectMetadata.setContentType(file.getContentType());
@@ -65,7 +65,7 @@ public class S3Service {
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
         String prefix = user.getId() + "-" + user.getNickName() + "-";
 
-        List<String> urls = this.uploadFile(files, prefix);
+        List<String> urls = this.uploadFile(files, prefix, "OriginText");
         urls.stream()
                 .forEach(url -> {
                     KakaoText kakaoText = new KakaoText(url, user);

@@ -18,7 +18,8 @@ public class ControllerAdvice {
             WebClientResponseException.class,
             NotFoundUserException.class,
             JwtException.class,
-            RuntimeException.class,
+            NoDataUploadedException.class,
+//            RuntimeException.class,
 
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
