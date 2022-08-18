@@ -86,8 +86,8 @@ public class JwtProvider {
         return new UsernamePasswordAuthenticationToken(userDetails,"",userDetails.getAuthorities());
     }
 
-    public Long getUserIdByToken(HttpServletRequest request) {
-        String token = request.getHeader("X-AUTH-TOKEN");
+    public Long getUserIdByHeader(HttpServletRequest request) {
+        String token = this.resolveToken(request);
         String userId = this.getPayload(token);
         return Long.parseLong(userId);
     }

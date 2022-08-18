@@ -10,8 +10,8 @@ import java.util.StringTokenizer;
 
 @Data
 public class KakaoMLDataSaveRequestDto {
-    private Long userId;
-    private List<KakaoMLData> data;
+    private Long user_pk;
+    private List<KakaoMLData> kakao_data;
 
 }
 

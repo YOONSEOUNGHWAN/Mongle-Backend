@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.NonUniqueResultException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,19 +30,26 @@ public class MLService {
     private final CalenderRepository calenderRepository;
     private final UserRepository userRepository;
     private final DailySentenceRepository dailySentenceRepository;
+    private final CalenderService calenderService;
 
     public void saveKakaoMLData(KakaoMLDataSaveRequestDto dto) {
-        Long userId = dto.getUserId();
-        List<KakaoMLData> datas = dto.getData();
-
+        Long userId = dto.getUser_pk();
+        List<KakaoMLData> datas = dto.getKakao_data();
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
 
-        // 매번 calender를 찾는 쿼리문이 나감,,, 수정할 방법을 찾고싶은데 모르겠다..
+        saveDailySentence(user, datas);
+        calenderRepository.saveCalenderEmotionCntByNatvieQuery(userId);
+    }
+
+    // 매번 calender를 찾는 쿼리문이 나감,,, 수정할 방법을 찾고싶은데 모르겠다..
+    private void saveDailySentence(User user, List<KakaoMLData> datas) {
         datas.stream()
                 .forEach(data -> {
-                    String time = data.getTime();
+                    String time = data.getDate_time();
                     LocalDateTime localDateTime = convertStringTimeToLocalDateTimeFormat(time);
-                    Calender calender = this.findCalenderByUserAndLocalDate(user, localDateTime);
+                    LocalDate localDate = localDateTime.toLocalDate();
+
+                    Calender calender = calenderService.findCalenderByUserAndLocalDate(user, localDate);
 
                     String sentence = data.getText();
                     Emotion emotion = data.getEmotion();
@@ -56,16 +64,7 @@ public class MLService {
                 });
     }
 
-    private Calender findCalenderByUserAndLocalDate(User user, LocalDateTime localDateTime) {
-        LocalDate localDate = localDateTime.toLocalDate();
-        Optional<Calender> optionalCalender = calenderRepository.findByUserAndDate(user, localDate);
 
-        if (optionalCalender.isEmpty()) {
-            Calender calender = new Calender(user, localDate);
-            return calenderRepository.save(calender);
-        }
-        return optionalCalender.get();
-    }
 
     private LocalDateTime convertStringTimeToLocalDateTimeFormat(String origin) {
         StringTokenizer st = new StringTokenizer(origin);
