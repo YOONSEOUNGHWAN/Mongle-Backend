@@ -19,6 +19,8 @@ public class DailySentence extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "calender_id")
     private Calender calender;
+
+    @Lob
     private String sentence;
     @Enumerated(EnumType.STRING)
     private Emotion emotion;
