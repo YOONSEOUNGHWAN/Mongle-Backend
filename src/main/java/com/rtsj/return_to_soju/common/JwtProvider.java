@@ -92,6 +92,10 @@ public class JwtProvider {
         return Long.parseLong(userId);
     }
 
+    public String resolveToken(HttpServletRequest request){
+        return request.getHeader("X-AUTH-TOKEN");
+    }
+
     public ReissueTokenResponseDto reissueToken(ReissueTokenRequestDto request){
         if(request.getRefreshToken() == null || !this.validateToken(request.getRefreshToken())) {
             throw new JwtException("유효하지 않은 토큰입니다. 다시 로그인 해주세요.");

@@ -18,6 +18,7 @@ public class ControllerAdvice {
             WebClientResponseException.class,
             NotFoundUserException.class,
             JwtException.class,
+            NoDataUploadedException.class,
 //            RuntimeException.class,
 
     })
