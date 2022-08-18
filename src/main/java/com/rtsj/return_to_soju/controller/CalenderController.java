@@ -34,18 +34,18 @@ public class CalenderController {
 
     @Operation(
             summary = "월 별 캘린더 데이터 조회 api",
-            description = "query parameter로 필요한 년도 및 월을 받아 해당 월의 감정 및 주제들을 반환한다."
+            description = "query parameter로 필요한 년도 및 월을 받아 해당 월의 감정 및 주제들을 반환한다. \n ex) /api/calender/{year}?start=3&end=5 : 3월부터 5월까지 데이터"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "요청 성공",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = CalenderBetweenMonthResponseDto.class))))
     })
-    @GetMapping("/calender/{year}/{start}/{end}")
+    @GetMapping("/calender/{year}")
     public ResponseEntity<List<CalenderBetweenMonthResponseDto>> getCalenderByMonth(
             HttpServletRequest request,
             @PathVariable(name = "year") String year,
-            @PathVariable(name = "start") String start,
-            @PathVariable(name = "end") String end) {
+            @RequestParam(value = "start") String start,
+            @RequestParam(value = "end") String end) {
         Long userId = jwtProvider.getUserIdByToken(request);
         List<CalenderBetweenMonthResponseDto> emotionBetweenMonth = calenderService.findEmotionBetweenMonth(userId, year, start, end);
         return ResponseEntity.ok().body(emotionBetweenMonth);
