@@ -1,8 +1,10 @@
 package com.rtsj.return_to_soju.model.entity;
 
+import com.rtsj.return_to_soju.model.dto.dto.KakaoTokenDto;
 import com.rtsj.return_to_soju.model.enums.Role;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,7 +15,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "RTUSER")
 @Getter
-public class User extends BaseEntity{
+@DynamicUpdate //상속 받는다고 어노테이션까지 상속은 안되더라...
+public class User extends BaseEntity implements Persistable<Long> {
     @Id
     @Column(name = "user_id")
     private Long id; //katalk PK 값으로 매핑하기
@@ -31,7 +34,7 @@ public class User extends BaseEntity{
     @OneToMany(mappedBy = "user")
     private List<Calender> calenderList = new ArrayList<>();
 
-    public User(Long id, String name, String nickName, String kakaoAccessToken, String kakaoRefreshToken, Role role){
+    public User(Long id, String name, String nickName, String kakaoAccessToken, String kakaoRefreshToken,  Role role){
         this.id = id;
         this.name = name;
         this.nickName = nickName;
@@ -39,18 +42,25 @@ public class User extends BaseEntity{
         this.kakaoRefreshToken = kakaoRefreshToken;
         this.role = role;
     }
-
-
     public void setKakaoUpdate(){
         this.kakaoUpdate = LocalDateTime.now();
     }
     public void updateNickName(String nickName){
         this.nickName = nickName;
     }
-    public void setKakaoToken(String kakaoAccessToken, String kakaoRefreshToken){
-        this.kakaoAccessToken = kakaoAccessToken;
+    public void updateKakaoRefreshToken(String kakaoRefreshToken){
         this.kakaoRefreshToken = kakaoRefreshToken;
     }
 
+    public void updateKakaoAccessToken(String kakaoAccessToken){
+        this.kakaoAccessToken = kakaoAccessToken;
+    }
+    @Override
+    public boolean isNew() {
+        return getCreateDate() == null;
+    }
 
+    public void addCalender(Calender calender) {
+        this.calenderList.add(calender);
+    }
 }

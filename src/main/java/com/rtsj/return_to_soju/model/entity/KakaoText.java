@@ -14,6 +14,7 @@ public class KakaoText extends BaseEntity {
     @Column(name = "kakao_id")
     private Long id;
 
+    //s3
     @Column(name = "kakao_url")
     private String url;
 

@@ -1,10 +1,13 @@
 package com.rtsj.return_to_soju.controller;
 
+import com.rtsj.return_to_soju.common.JwtProvider;
+import com.rtsj.return_to_soju.common.SuccessResponseResult;
 import com.rtsj.return_to_soju.model.dto.request.WriteDiaryDto;
+import com.rtsj.return_to_soju.model.dto.response.CalenderBetweenMonthResponseDto;
 import com.rtsj.return_to_soju.model.dto.response.CalenderByDayDto;
-import com.rtsj.return_to_soju.model.dto.response.CalenderByMonthDto;
 import com.rtsj.return_to_soju.model.dto.response.SentenceByEmotionWithDayDto;
 import com.rtsj.return_to_soju.model.enums.Emotion;
+import com.rtsj.return_to_soju.service.CalenderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,32 +15,45 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.util.List;
 
 @Tag(name = "Calender Controller", description = "Calender controller desc")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api")
 public class CalenderController {
 
     // 만들까 말까~
 //    @GetMapping("/calender/{calenderId}")
+    private final CalenderService calenderService;
+    private final JwtProvider jwtProvider;
 
     @Operation(
             summary = "월 별 캘린더 데이터 조회 api",
-            description = "query parameter로 필요한 년도 및 월을 받아 해당 월의 감정 및 주제들을 반환한다."
+            description = "query parameter로 필요한 년도 및 월을 받아 해당 월의 감정 및 주제들을 반환한다. \n ex) /api/calender/{year}?start=3&end=5 : 3월부터 5월까지 데이터"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "요청 성공",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = CalenderByMonthDto.class))))
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = CalenderBetweenMonthResponseDto.class))))
     })
-    @GetMapping("/calender/{year}/{month}")
-    public String getCalenderByMonth(
+    @GetMapping("/calender/{year}")
+    public ResponseEntity<List<CalenderBetweenMonthResponseDto>> getCalenderByMonth(
+            HttpServletRequest request,
             @PathVariable(name = "year") String year,
-            @PathVariable(name = "month") String month
-    ) {
-
-        return null;
+            @RequestParam(value = "start") String start,
+            @RequestParam(value = "end") String end) {
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        List<CalenderBetweenMonthResponseDto> emotionBetweenMonth = calenderService.findEmotionBetweenMonth(userId, year, start, end);
+        return ResponseEntity.ok().body(emotionBetweenMonth);
     }
+
+
 
     @Operation(
             summary = "일 별 캘린더 데이터 조회 api",
@@ -60,7 +76,7 @@ public class CalenderController {
 
 
     @Operation(
-            summary = "일기 작성 api",
+            summary = "일기 작성 or 수정 api (완료)",
             description = "path variable로 필요한 년도, 월, 일(22/07/26)을 입력 받은 후 body로 일기 내용을 입력받아 일기를 작성한다."
     )
     @ApiResponses(
@@ -69,14 +85,21 @@ public class CalenderController {
             }
     )
     @PostMapping("/calender/{year}/{month}/{day}/diary")
-    public String writeDiary(
+    public ResponseEntity<SuccessResponseResult> writeDiary(
             @PathVariable(name = "year") String year,
             @PathVariable(name = "month") String month,
             @PathVariable(name = "day") String day,
-            @RequestBody WriteDiaryDto dto
+            @RequestBody WriteDiaryDto dto,
+            HttpServletRequest request
     ) {
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        String diaryText = dto.getText();
+        calenderService.createDiary(userId, year, month, day, diaryText);
 
-        return null;
+        String uri = "/calender/" + year + "/" + month + "/" + day + "/diary";
+        return ResponseEntity
+                .created(URI.create(uri))
+                .body(new SuccessResponseResult("일기 등록 완료"));
     }
 
     @Operation(

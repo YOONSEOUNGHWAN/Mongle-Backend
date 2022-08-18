@@ -38,7 +38,7 @@ public class AwsController {
     )
     @PostMapping("/s3/kakao")
     public ResponseEntity uploadKakaoText(@ModelAttribute UploadKakaoTextDto dto, HttpServletRequest request) {
-        Long userId = jwtProvider.getUserIdByToken(request);
+        Long userId = jwtProvider.getUserIdByHeader(request);
         s3Service.uploadKakaoFile(dto.getFiles(), userId);
 
         return ResponseEntity.created(URI.create("/api/s3/kakao/"))
