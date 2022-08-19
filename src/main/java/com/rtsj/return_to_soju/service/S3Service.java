@@ -69,7 +69,7 @@ public class S3Service {
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
         String prefix = user.getId() + "-" + user.getNickName() + "-";
 
-        List<String> urls = this.uploadFile(files, prefix, "OriginText");
+        List<String> urls = this.uploadFile(files, prefix, "origin");
         urls.stream()
                 .forEach(url -> {
                     KakaoText kakaoText = new KakaoText(url, user);
