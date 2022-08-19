@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.List;
 
+@Slf4j
 @Tag(name = "Calender Controller", description = "Calender controller desc")
 @RestController
 @RequiredArgsConstructor
@@ -103,7 +105,7 @@ public class CalenderController {
     }
 
     @Operation(
-            summary = "일자 및 감정별 대화 문장 불러오는 api",
+            summary = "일자 및 감정별 대화 문장 불러오는 api (완료)",
             description = "특정 일의 분석화면에서 감정이를 눌렀을 때 해당하는 대화 문장들을 불러온다."
     )
     @ApiResponses(
@@ -113,7 +115,18 @@ public class CalenderController {
             }
     )
     @GetMapping("/calender/{year}/{month}/{day}/sentences")
-    public String getEmotionSentence(@RequestParam("emotion") Emotion emotion) {
-        return null;
+    public ResponseEntity<List> getEmotionSentence(
+            @PathVariable(name = "year") String year,
+            @PathVariable(name = "month") String month,
+            @PathVariable(name = "day") String day,
+            @RequestParam("emotion") Emotion emotion,
+            HttpServletRequest request
+    ) {
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        log.info(userId +"유저 kakao txt 파일 올리기 요청");
+        List<SentenceByEmotionWithDayDto> sentenceByEmotionWithDay = calenderService.getSentenceByEmotionWithDay(userId, year, month, day, emotion);
+
+        return ResponseEntity.ok()
+                .body(sentenceByEmotionWithDay);
     }
 }
