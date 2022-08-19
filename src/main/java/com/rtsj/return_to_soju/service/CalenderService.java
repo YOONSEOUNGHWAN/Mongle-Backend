@@ -2,16 +2,19 @@ package com.rtsj.return_to_soju.service;
 
 import com.rtsj.return_to_soju.exception.NotFoundUserException;
 import com.rtsj.return_to_soju.model.dto.response.CalenderBetweenMonthResponseDto;
+import com.rtsj.return_to_soju.model.dto.response.SentenceByEmotionWithDayDto;
 import com.rtsj.return_to_soju.model.entity.Calender;
+import com.rtsj.return_to_soju.model.entity.DailySentence;
 import com.rtsj.return_to_soju.model.entity.User;
+import com.rtsj.return_to_soju.model.enums.Emotion;
 import com.rtsj.return_to_soju.repository.CalenderRepository;
+import com.rtsj.return_to_soju.repository.DailySentenceRepository;
 import com.rtsj.return_to_soju.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.List;
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 public class CalenderService {
     private final CalenderRepository calenderRepository;
     private final UserRepository userRepository;
+    private final DailySentenceRepository dailySentenceRepository;
     @Transactional //User의 정보를 가져오는데 사용됨.. 추가로, UserRepository에서 캘린더를 빼오면 어떨까... 성능측면에서는 비슷해 보이는뎅..
     public List<CalenderBetweenMonthResponseDto> findEmotionBetweenMonth(Long userId, String year, String start, String end) {
         int parseYear = Integer.parseInt(year);
@@ -45,8 +49,7 @@ public class CalenderService {
 
     @Transactional
     public void createDiary(Long userId, String year, String month, String day, String diaryText) {
-        String date = year + "-" + month + "-" + day;
-        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
+        LocalDate localDate = this.createLocalDateWithString(year, month, day);
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
 
         Calender calender = findCalenderByUserAndLocalDate(user, localDate);
@@ -55,6 +58,8 @@ public class CalenderService {
         calenderRepository.save(calender);
     }
 
+    // 유저와 yyyy-mm-dd로 캘린더를 찾는 로직
+    // if 캘린더가 없으면 만들어서 리턴
     public Calender findCalenderByUserAndLocalDate(User user, LocalDate localDate) {
         Optional<Calender> optionalCalender = calenderRepository.findByUserAndDate(user, localDate);
 
@@ -64,4 +69,25 @@ public class CalenderService {
         }
         return optionalCalender.get();
     }
+
+    // year, month, day 가 인자로 들어왔을 때, LocalDate형식을 만들어서 반환
+    private LocalDate createLocalDateWithString(String year, String month, String day) {
+        String date = year + "-" + month + "-" + day;
+        return LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
+    }
+
+    public List<SentenceByEmotionWithDayDto> getSentenceByEmotionWithDay(Long userId, String year, String month, String day, Emotion emotion) {
+        User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
+        LocalDate localDate = this.createLocalDateWithString(year, month, day);
+        Calender calender = this.findCalenderByUserAndLocalDate(user, localDate);
+
+        List<DailySentence> byCalenderAndEmotion = dailySentenceRepository.findByCalenderAndEmotion(calender, emotion);
+        return byCalenderAndEmotion.stream()
+                .map(SentenceByEmotionWithDayDto::new)
+                .collect(Collectors.toList());
+
+
+    }
+
+
 }

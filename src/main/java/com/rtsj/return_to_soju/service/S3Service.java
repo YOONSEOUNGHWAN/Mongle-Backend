@@ -10,6 +10,7 @@ import com.rtsj.return_to_soju.model.entity.User;
 import com.rtsj.return_to_soju.repository.KakaoTextRepository;
 import com.rtsj.return_to_soju.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class S3Service {
@@ -35,6 +37,7 @@ public class S3Service {
     private final KakaoTextRepository kakaoTextRepository;
 
     public List<String> uploadFile(List<MultipartFile> files, String prefix, String dirname) {
+        log.info("S3 파일올리는 로직 시작");
         List<String> fileNameList = new ArrayList<>();
         files.stream()
                 .forEach(file -> {
@@ -52,6 +55,7 @@ public class S3Service {
 
                     fileNameList.add(fileName);
                 });
+        log.info("S3 파일올리는 로직 완료");
         return fileNameList;
     }
 
@@ -71,5 +75,6 @@ public class S3Service {
                     KakaoText kakaoText = new KakaoText(url, user);
                     kakaoTextRepository.save(kakaoText);
                 });
+        log.info(userId+ "유저가 kakao 파일을 성공적으로 올렸습니다.");
     }
 }
