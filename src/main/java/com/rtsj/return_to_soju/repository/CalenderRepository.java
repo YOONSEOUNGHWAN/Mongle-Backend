@@ -21,8 +21,8 @@ public interface CalenderRepository extends JpaRepository<Calender, Long> {
             "update calender c " +
             "set c.angry = " +
             "(select count(*) from daily_sentence d where d.calender_id=c.calender_id and d.emotion in('ANGRY')), " +
-            "c.anxios = " +
-            "(select count(*) from daily_sentence d where d.calender_id=c.calender_id and d.emotion in('ANXIOS')), " +
+            "c.anxious = " +
+            "(select count(*) from daily_sentence d where d.calender_id=c.calender_id and d.emotion in('ANXIOUS')), " +
             "c.happy = " +
             "(select count(*) from daily_sentence d where d.calender_id=c.calender_id and d.emotion in('HAPPY')), " +
             "c.neutral = " +
@@ -38,4 +38,22 @@ public interface CalenderRepository extends JpaRepository<Calender, Long> {
             "where rtuser.user_id=:userId) as t)",
             nativeQuery = true)
     int saveCalenderEmotionCntByNatvieQuery(@Param("userId") Long userId);
+
+    @Modifying
+    @Query(value =
+            "update calender c1 " +
+                    "set c1.emotion = " +
+                    "case " +
+                        "(select * from (select greatest(c2.angry, c2.anxious, c2.happy, c2.neutral, c2.sad, c2.tired) from calender c2 where c2.calender_id = c1.calender_id) as a) " +
+                    "when c1.happy then 'HAPPY' " +
+                    "when c1.neutral then 'NEUTRAL' " +
+                    "when c1.anxious then 'ANXIOUS' " +
+                    "when c1.angry then 'ANGRY' " +
+                    "when c1.sad then 'SAD' " +
+                    "when c1.tired then 'TIRED' " +
+                    "end " +
+                    "where c1.calender_id in " +
+                    "(select * from (select c3.calender_id from calender c3 join rtuser r on c3.user_id = r.user_id where r.user_id =:userId) as a)",
+            nativeQuery = true)
+    int saveCalenderMainEmotionByNativeQuery(@Param("userId") Long userId);
 }

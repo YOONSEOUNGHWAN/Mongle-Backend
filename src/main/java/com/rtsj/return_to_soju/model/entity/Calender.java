@@ -38,7 +38,7 @@ public class Calender extends BaseEntity {
     private Integer happy;
     private Integer neutral;
     private Integer angry;
-    private Integer anxios;
+    private Integer anxious;
     private Integer tired;
     private Integer sad;
 

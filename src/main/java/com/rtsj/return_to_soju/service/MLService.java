@@ -39,6 +39,7 @@ public class MLService {
 
         saveDailySentence(user, datas);
         calenderRepository.saveCalenderEmotionCntByNatvieQuery(userId);
+        calenderRepository.saveCalenderMainEmotionByNativeQuery(userId);
     }
 
     // 매번 calender를 찾는 쿼리문이 나감,,, 수정할 방법을 찾고싶은데 모르겠다..
