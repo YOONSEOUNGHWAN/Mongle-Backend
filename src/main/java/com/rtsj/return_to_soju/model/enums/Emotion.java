@@ -1,5 +1,7 @@
 package com.rtsj.return_to_soju.model.enums;
 
+import org.springframework.context.annotation.Bean;
+
 public enum Emotion {
 
     HAPPY("행복"), NEUTRAL("중립"), ANGRY("분노"), ANXIOUS("불안"), TIRED("피곤"), SAD("슬픔"),

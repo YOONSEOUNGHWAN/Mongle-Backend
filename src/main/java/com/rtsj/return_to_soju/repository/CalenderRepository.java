@@ -15,7 +15,6 @@ import java.util.Optional;
 public interface CalenderRepository extends JpaRepository<Calender, Long> {
     Optional<Calender> findByUserAndDate(User user, LocalDate date);
     List<Calender> findALLByUserAndDateBetween(User user, LocalDate start, LocalDate end);
-
     @Modifying
     @Query(value = "" +
             "update calender c " +

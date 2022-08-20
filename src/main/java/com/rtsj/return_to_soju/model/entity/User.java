@@ -49,6 +49,7 @@ public class User extends BaseEntity implements Persistable<Long> {
     public void updateNickName(String nickName){
         this.nickName = nickName;
     }
+    public void updateUserName(String userName){this.name = userName;}
     public void updateKakaoRefreshToken(String kakaoRefreshToken){
         this.kakaoRefreshToken = kakaoRefreshToken;
     }
@@ -60,6 +61,7 @@ public class User extends BaseEntity implements Persistable<Long> {
     public boolean isNew() {
         return getCreateDate() == null;
     }
+
 
     public void addCalender(Calender calender) {
         this.calenderList.add(calender);
