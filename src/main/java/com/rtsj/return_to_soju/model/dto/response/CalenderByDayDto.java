@@ -28,8 +28,6 @@ public class CalenderByDayDto {
                 .collect(Collectors.toList());
         for(int i=0; i<Emotion.values().length; i++){
             this.emotionList.add(new EmotionWithPercentDto(Emotion.values()[i], (int) (calender.getEmotionPercent(i)*100)));
-            System.out.println("Emotion.values()[i] = " + Emotion.values()[i]);
-            System.out.println("calender.getEmotionPercent(i) = " + calender.getEmotionPercent(i));
         }
     }
 }

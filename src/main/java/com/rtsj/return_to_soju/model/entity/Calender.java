@@ -35,7 +35,6 @@ public class Calender extends BaseEntity {
     private List<DailyTopic> topicList = new ArrayList<>();
     @OneToMany(mappedBy = "calender")
     private List<ImageFile> imageList = new ArrayList<>();
-
     private Integer happy;
     private Integer neutral;
     private Integer angry;
@@ -49,48 +48,14 @@ public class Calender extends BaseEntity {
         user.addCalender(this);
     }
     public double getEmotionPercent(int i){
-        if(this.emotion == null) {
-            System.out.println("감정분석 안됐지롱~~~~~~~~₩₩₩");
-            return 0;
-        }
+        if(this.emotion == null) return 0;
         Emotion value = Emotion.values()[i];
-        if(Emotion.HAPPY == value) {
-            System.out.println("happy = " + happy);
-            System.out.println("neutral = " + neutral);
-            System.out.println("angry = " + angry);
-
-            return happy.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
-        }
-        else if(Emotion.NEUTRAL == value){
-            System.out.println("happy = " + happy);
-            System.out.println("neutral = " + neutral);
-            System.out.println("angry = " + angry);
-            return neutral.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
-        }
-        else if(Emotion.SAD == value){
-            System.out.println("happy = " + happy);
-            System.out.println("neutral = " + neutral);
-            System.out.println("angry = " + angry);
-            return sad.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
-        }
-        else if(Emotion.ANXIOUS == value){
-            System.out.println("happy = " + happy);
-            System.out.println("neutral = " + neutral);
-            System.out.println("angry = " + angry);
-            return anxious.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
-        }
-        else if(Emotion.ANGRY == value){
-            System.out.println("happy = " + happy);
-            System.out.println("neutral = " + neutral);
-            System.out.println("angry = " + angry);
-            return angry.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
-        }
-        else if(Emotion.TIRED == value){
-            System.out.println("happy = " + happy);
-            System.out.println("neutral = " + neutral);
-            System.out.println("angry = " + angry);
-            return tired.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
-        }
+        if(Emotion.HAPPY == value) return happy.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
+        else if(Emotion.NEUTRAL == value)return neutral.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
+        else if(Emotion.SAD == value)return sad.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
+        else if(Emotion.ANXIOUS == value)return anxious.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
+        else if(Emotion.ANGRY == value)return angry.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
+        else if(Emotion.TIRED == value)return tired.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
         else throw new IllegalArgumentException("잘못된 입력입니다.");
     }
 

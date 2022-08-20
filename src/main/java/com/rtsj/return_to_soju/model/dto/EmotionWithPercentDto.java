@@ -8,9 +8,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class EmotionWithPercentDto {
-
     private Emotion emotion;
-
     private int percent;
 
 }
