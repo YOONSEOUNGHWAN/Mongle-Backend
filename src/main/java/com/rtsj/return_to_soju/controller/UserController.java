@@ -7,6 +7,7 @@ import com.rtsj.return_to_soju.model.dto.request.UserNameRequestDto;
 import com.rtsj.return_to_soju.model.dto.response.LoginResponseDto;
 import com.rtsj.return_to_soju.model.dto.response.ReissueTokenResponseDto;
 import com.rtsj.return_to_soju.model.dto.response.SuccessResponseDto;
+import com.rtsj.return_to_soju.model.dto.response.UserInfoResponseDto;
 import com.rtsj.return_to_soju.repository.UserRepository;
 import com.rtsj.return_to_soju.service.OauthService;
 import com.rtsj.return_to_soju.service.UserService;
@@ -57,6 +58,18 @@ public class UserController {
         String userName = userNameDto.getUserName();
         userService.saveAndUpdateUserName(userId, userName);
         return ResponseEntity.ok(new SuccessResponseDto("변경이 완료되었습니다!"));
+    }
+
+    @Operation(summary = "사용자 정보 조회 API", description = "사용자 정보를 반환합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK !!",
+                    content = @Content(schema = @Schema(implementation = UserInfoResponseDto.class)))
+    })
+    @PostMapping("/users/info")
+    public ResponseEntity<UserInfoResponseDto> loginWithKakao(HttpServletRequest request){
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        UserInfoResponseDto userInfo = userService.getUserInfo(userId);
+        return ResponseEntity.ok().body(userInfo);
     }
 
 

@@ -1,6 +1,7 @@
 package com.rtsj.return_to_soju.service;
 
 import com.rtsj.return_to_soju.exception.NotFoundUserException;
+import com.rtsj.return_to_soju.model.dto.response.UserInfoResponseDto;
 import com.rtsj.return_to_soju.model.entity.User;
 import com.rtsj.return_to_soju.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,5 +21,10 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
         user.updateUserName(userName);
         return;
+    }
+
+    public UserInfoResponseDto getUserInfo(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
+        return new UserInfoResponseDto(user);
     }
 }
