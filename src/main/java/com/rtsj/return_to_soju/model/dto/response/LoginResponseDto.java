@@ -12,12 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class LoginResponseDto {
-
-    @Schema(description = "사용자 kakao id값", example = "2374316219")
-    private Long id;
-    @Schema(description = "사용자 카카오 닉네임", nullable = true, example = "윤승환")
-    private String kakaoName;
-    @Schema(description = "Mongle xAccess Token", example = "aldksfja;esoifjaslkdfaeafsdvsaer")
+    @Schema(description = "Mongle Access Token", example = "aldksfja;esoifjaslkdfaeafsdvsaer")
     private String accessToken;
     @Schema(description = "Mongle Refresh Token", example = "a;dlksfjaewovnaslkdwfeawvscvewaew")
     private String refreshToken;
@@ -25,10 +20,6 @@ public class LoginResponseDto {
     @Schema(description = "새로운 회원인지 여부, true면 새로운 회원", example = "true")
     private Boolean isNew;
 
-    public void setUserInfo(User user) {
-        this.id = user.getId();
-        this.kakaoName = user.getKakaoName();
-    }
 
 
 }

@@ -51,16 +51,14 @@ public class UserService {
             User user = findUser.get();
             user.updateKakaoName(nickName);
             user.updateKokaoToken(kakaoTokenDto);
-            userRepository.save(user);
-            dto.setUserInfo(user);
+
         }else{
             dto.setIsNew(true);
             User user = new User(userId, nickName, kakaoTokenDto, Role.ROLE_USER);
             userRepository.save(user);
-            dto.setUserInfo(user);
         }
 
-        String accessToken = jwtProvider.createAccessToken(String.valueOf(dto.getId()));
+        String accessToken = jwtProvider.createAccessToken(String.valueOf(userId));
         String refreshToken = jwtProvider.createRefreshToken();
         dto.setAccessToken(accessToken);
         dto.setRefreshToken(refreshToken);
