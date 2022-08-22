@@ -39,10 +39,13 @@ public class OauthService {
 
     @Transactional
     public LoginResponseDto loginWithKakaoToken(KakaoTokenDto kakaoTokenDto) {
-        User user = createAndUpdateKakaoUserProfileWithToken(kakaoTokenDto);
-        String accessToken = jwtProvider.createAccessToken(String.valueOf(user.getId()));
+        LoginResponseDto result = createAndUpdateKakaoUserProfileWithToken(kakaoTokenDto);
+        String accessToken = jwtProvider.createAccessToken(String.valueOf(result.getId()));
         String refreshToken = jwtProvider.createRefreshToken();
-        return new LoginResponseDto(user, accessToken, refreshToken);
+        result.setAccessToken(accessToken);
+        result.setRefreshToken(refreshToken);
+
+        return result;
     }
 
     /**
@@ -68,7 +71,7 @@ public class OauthService {
                 .block();
     }
 
-    private User createAndUpdateKakaoUserProfileWithToken(KakaoTokenDto kakaoTokenDto){
+    private LoginResponseDto createAndUpdateKakaoUserProfileWithToken(KakaoTokenDto kakaoTokenDto){
         KakaoUserInfo kakaoUserInfo = getKakaoUserInfoWithToken(kakaoTokenDto);
         Long kakao_id = kakaoUserInfo.getId();
         String name = kakaoUserInfo.getName();
@@ -79,11 +82,11 @@ public class OauthService {
             existUser.updateNickName(nickName);
             existUser.updateKakaoAccessToken(kakaoTokenDto.getAccessToken());
             existUser.updateKakaoRefreshToken(kakaoTokenDto.getRefreshToken());
-            return existUser;
+            return new LoginResponseDto(existUser, false);
         }
         User user = new User(kakao_id, name, nickName, kakaoTokenDto.getAccessToken(), kakaoTokenDto.getRefreshToken(), Role.ROLE_USER);
-        User save = userRepository.save(user);
-        return save;
+        userRepository.save(user);
+        return new LoginResponseDto(user, true);
     }
 
     private KakaoUserInfo getKakaoUserInfoWithToken(KakaoTokenDto kakaoTokenDto) {

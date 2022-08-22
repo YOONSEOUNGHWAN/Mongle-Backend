@@ -20,8 +20,8 @@ public class User extends BaseEntity implements Persistable<Long> {
     @Id
     @Column(name = "user_id")
     private Long id; //katalk PK 값으로 매핑하기
-    private String name;
-    private String nickName;
+    private String mongleName;
+    private String kakaoName;
     private String kakaoAccessToken;
     private String kakaoRefreshToken;
     private String cloudEmail;
@@ -37,8 +37,8 @@ public class User extends BaseEntity implements Persistable<Long> {
 
     public User(Long id, String name, String nickName, String kakaoAccessToken, String kakaoRefreshToken,  Role role){
         this.id = id;
-        this.name = name;
-        this.nickName = nickName;
+        this.mongleName = name;
+        this.kakaoName = nickName;
         this.kakaoAccessToken = kakaoAccessToken;
         this.kakaoRefreshToken = kakaoRefreshToken;
         this.role = role;
@@ -47,9 +47,9 @@ public class User extends BaseEntity implements Persistable<Long> {
         this.kakaoUpdate = LocalDateTime.now();
     }
     public void updateNickName(String nickName){
-        this.nickName = nickName;
+        this.kakaoName = nickName;
     }
-    public void updateUserName(String userName){this.name = userName;}
+    public void updateUserName(String userName){this.mongleName = userName;}
     public void updateKakaoRefreshToken(String kakaoRefreshToken){
         this.kakaoRefreshToken = kakaoRefreshToken;
     }
