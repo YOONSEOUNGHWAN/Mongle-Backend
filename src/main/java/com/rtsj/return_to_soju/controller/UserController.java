@@ -43,7 +43,7 @@ public class UserController {
     })
     @PostMapping("/login/kakao")
     public ResponseEntity<LoginResponseDto> loginWithKakao(@RequestBody KakaoTokenDto kakaoTokenDto){
-        LoginResponseDto loginResponseDto = oauthService.loginWithKakaoToken(kakaoTokenDto);
+        LoginResponseDto loginResponseDto = userService.loginWithKakaoToken(kakaoTokenDto);
         return ResponseEntity.ok().body(loginResponseDto);
     }
 
