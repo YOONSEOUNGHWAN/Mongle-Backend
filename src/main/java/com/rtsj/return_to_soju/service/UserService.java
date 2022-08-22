@@ -27,4 +27,15 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
         return new UserInfoResponseDto(user);
     }
+
+    public String getUserFcmToken(Long userId){
+        User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
+        return user.getFcmToken();
+    }
+
+    public void SaveUserFcmToken(Long userId, String fcmToken){
+        User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
+        user.setFcmToken(fcmToken);
+        return;
+    }
 }

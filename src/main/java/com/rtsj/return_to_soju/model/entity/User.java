@@ -46,6 +46,7 @@ public class User extends BaseEntity implements Persistable<Long> {
     public void setKakaoUpdate(){
         this.kakaoUpdate = LocalDateTime.now();
     }
+    public void setFcmToken(String fcmToken){this.fcmToken = fcmToken;}
     public void updateNickName(String nickName){
         this.nickName = nickName;
     }
@@ -61,7 +62,6 @@ public class User extends BaseEntity implements Persistable<Long> {
     public boolean isNew() {
         return getCreateDate() == null;
     }
-
 
     public void addCalender(Calender calender) {
         this.calenderList.add(calender);

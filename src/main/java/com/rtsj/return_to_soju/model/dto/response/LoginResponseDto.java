@@ -3,11 +3,12 @@ package com.rtsj.return_to_soju.model.dto.response;
 import com.rtsj.return_to_soju.model.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Schema(description = "회원가입 및 로그인 응답")
-@Getter
+@Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoginResponseDto {
     @Schema(description = "사용자 이름", nullable = true, example = "윤승환")
