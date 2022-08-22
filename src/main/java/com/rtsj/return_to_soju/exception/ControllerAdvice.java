@@ -20,8 +20,8 @@ public class ControllerAdvice {
             JwtException.class,
             NoDataUploadedException.class,
 //            RuntimeException.class,
-            InvalidTokenException.class
-
+            InvalidTokenException.class,
+            NullPointerException.class,
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ErrorResponseResult exceptionHandler(HttpServletRequest request, Exception e) {

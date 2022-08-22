@@ -2,6 +2,7 @@ package com.rtsj.return_to_soju.service;
 
 import com.rtsj.return_to_soju.exception.NotFoundUserException;
 import com.rtsj.return_to_soju.model.dto.response.CalenderBetweenMonthResponseDto;
+import com.rtsj.return_to_soju.model.dto.response.CalenderByDayDto;
 import com.rtsj.return_to_soju.model.dto.response.SentenceByEmotionWithDayDto;
 import com.rtsj.return_to_soju.model.entity.Calender;
 import com.rtsj.return_to_soju.model.entity.DailySentence;
@@ -29,17 +30,20 @@ public class CalenderService {
     private final UserRepository userRepository;
     private final DailySentenceRepository dailySentenceRepository;
     @Transactional //User의 정보를 가져오는데 사용됨.. 추가로, UserRepository에서 캘린더를 빼오면 어떨까... 성능측면에서는 비슷해 보이는뎅..
-    public List<CalenderBetweenMonthResponseDto> findEmotionBetweenMonth(Long userId, String year, String start, String end) {
-        int parseYear = Integer.parseInt(year);
-        int startMonth = Integer.parseInt(start);
-        int endMonth = Integer.parseInt(end);
+    public List<CalenderBetweenMonthResponseDto> getEmotionBetweenMonth(Long userId, String start, String end) {
+        String[] startDate = start.split("-");
+        String[] endDate = end.split("-");
+        int startYear = Integer.parseInt(startDate[0]);
+        int startMonth = Integer.parseInt(startDate[1]);
+        int endYear = Integer.parseInt(endDate[0]);
+        int endMonth = Integer.parseInt(endDate[1]);
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
         Calendar cal = Calendar.getInstance();
-        cal.set(parseYear, endMonth -1, 1);
+        cal.set(endYear, endMonth -1, 1);
         List<CalenderBetweenMonthResponseDto> responseDtoList = calenderRepository.findALLByUserAndDateBetween(
                         user,
-                        LocalDate.of(parseYear, startMonth, 1),
-                        LocalDate.of(parseYear, endMonth, cal.getActualMaximum(Calendar.DAY_OF_MONTH))
+                        LocalDate.of(startYear, startMonth, 1),
+                        LocalDate.of(endYear, endMonth, cal.getActualMaximum(Calendar.DAY_OF_MONTH))
                 )
                 .stream()
                 .map(CalenderBetweenMonthResponseDto::new)
@@ -90,4 +94,10 @@ public class CalenderService {
     }
 
 
+    public CalenderByDayDto getDailyDataFromUser(Long userId, String year, String month, String day) {
+        User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
+        LocalDate localDate = this.createLocalDateWithString(year, month, day);
+        Calender calender = this.findCalenderByUserAndLocalDate(user, localDate);
+        return new CalenderByDayDto(calender);
+    }
 }

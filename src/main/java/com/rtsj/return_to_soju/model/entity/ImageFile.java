@@ -2,6 +2,7 @@ package com.rtsj.return_to_soju.model.entity;
 
 import com.rtsj.return_to_soju.model.enums.ImageType;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ImageFile extends BaseEntity{
 

@@ -3,9 +3,14 @@ package com.rtsj.return_to_soju.controller;
 import com.rtsj.return_to_soju.common.JwtProvider;
 import com.rtsj.return_to_soju.model.dto.dto.KakaoTokenDto;
 import com.rtsj.return_to_soju.model.dto.request.ReissueTokenRequestDto;
+import com.rtsj.return_to_soju.model.dto.request.UserNameRequestDto;
 import com.rtsj.return_to_soju.model.dto.response.LoginResponseDto;
 import com.rtsj.return_to_soju.model.dto.response.ReissueTokenResponseDto;
+import com.rtsj.return_to_soju.model.dto.response.SuccessResponseDto;
+import com.rtsj.return_to_soju.model.dto.response.UserInfoResponseDto;
+import com.rtsj.return_to_soju.repository.UserRepository;
 import com.rtsj.return_to_soju.service.OauthService;
+import com.rtsj.return_to_soju.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 @Tag(name = "USER", description = "로그인 API")
 @RequiredArgsConstructor
 @Slf4j
@@ -24,7 +32,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class UserController {
     private final OauthService oauthService;
+    private final UserService userService;
     private final JwtProvider jwtProvider;
+
     @Operation(summary = "로그인 API", description = "카카오 access & refresh 토큰을 사용한 회원가입 및 로그인 입니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK !!",
@@ -35,6 +45,33 @@ public class UserController {
         LoginResponseDto loginResponseDto = oauthService.loginWithKakaoToken(kakaoTokenDto);
         return ResponseEntity.ok().body(loginResponseDto);
     }
+
+
+    @Operation(summary = "이름 받기 API", description = "회원가입시 전달받은 토큰을 사용하여, 회원 이름을 등록 및 변경합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK !!",
+                    content = @Content(schema = @Schema(implementation = SuccessResponseDto.class)))
+    })
+    @PostMapping("/users/name")
+    public ResponseEntity<SuccessResponseDto> loginWithKakao(HttpServletRequest request, @Valid @RequestBody UserNameRequestDto userNameDto){
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        String userName = userNameDto.getUserName();
+        userService.saveAndUpdateUserName(userId, userName);
+        return ResponseEntity.ok(new SuccessResponseDto("변경이 완료되었습니다!"));
+    }
+
+    @Operation(summary = "사용자 정보 조회 API", description = "사용자 정보를 반환합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK !!",
+                    content = @Content(schema = @Schema(implementation = UserInfoResponseDto.class)))
+    })
+    @PostMapping("/users/info")
+    public ResponseEntity<UserInfoResponseDto> loginWithKakao(HttpServletRequest request){
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        UserInfoResponseDto userInfo = userService.getUserInfo(userId);
+        return ResponseEntity.ok().body(userInfo);
+    }
+
 
     @Operation(summary = "토큰재발급 API", description = "Mongle access & refresh 토큰을 사용하여 AccessToken을 발급합니다.")
     @ApiResponses({
@@ -68,4 +105,6 @@ public class UserController {
         ReissueTokenResponseDto kakaoToken = oauthService.renewKakaoToken(request.getRefreshToken());
         return kakaoToken;
     }
+
+
 }

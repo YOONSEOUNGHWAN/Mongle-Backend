@@ -1,5 +1,6 @@
 package com.rtsj.return_to_soju.model.entity;
 
+import com.rtsj.return_to_soju.model.dto.EmotionWithPercentDto;
 import com.rtsj.return_to_soju.model.enums.Emotion;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,7 +35,6 @@ public class Calender extends BaseEntity {
     private List<DailyTopic> topicList = new ArrayList<>();
     @OneToMany(mappedBy = "calender")
     private List<ImageFile> imageList = new ArrayList<>();
-
     private Integer happy;
     private Integer neutral;
     private Integer angry;
@@ -47,6 +47,19 @@ public class Calender extends BaseEntity {
         this.date = date;
         user.addCalender(this);
     }
+    public double getEmotionPercent(int i){
+        if(this.emotion == null) return 0;
+        Emotion value = Emotion.values()[i];
+        if(Emotion.HAPPY == value) return happy.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
+        else if(Emotion.NEUTRAL == value)return neutral.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
+        else if(Emotion.SAD == value)return sad.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
+        else if(Emotion.ANXIOUS == value)return anxious.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
+        else if(Emotion.ANGRY == value)return angry.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
+        else if(Emotion.TIRED == value)return tired.doubleValue()/(happy+neutral+angry+anxious+tired+sad);
+        else throw new IllegalArgumentException("잘못된 입력입니다.");
+    }
+
+
 
     public void writeOrUpdateDiary(String diary) {
         this.diary = diary;
