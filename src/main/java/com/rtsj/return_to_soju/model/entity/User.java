@@ -45,12 +45,14 @@ public class User extends BaseEntity implements Persistable<Long> {
     public void setKakaoUpdate(){
         this.kakaoUpdate = LocalDateTime.now();
     }
+    public void setFcmToken(String fcmToken){this.fcmToken = fcmToken;}
+
     public void updateKakaoName(String nickName){
         this.kakaoName = nickName;
     }
     public void updateMongleName(String userName){this.mongleName = userName;}
 
-    public void updateKokaoToken(KakaoTokenDto kakaoTokenDto) {
+    public void updateKakaoToken(KakaoTokenDto kakaoTokenDto) {
         this.kakaoAccessToken = kakaoTokenDto.getAccessToken();
         this.kakaoRefreshToken = kakaoTokenDto.getRefreshToken();
     }

@@ -70,8 +70,7 @@ public class FirebaseCloudMessageService{
         Request request = new Request.Builder()
                 .url(fcmUrl)
                 .post(requestBody)
-                .addHeader(HttpHeaders.AUTHORIZATION,"Bearer"+getAccessToken())
-                .addHeader(HttpHeaders.CONTENT_TYPE,"application/json;UTF-8")
+                .addHeader(HttpHeaders.AUTHORIZATION,"Bearer "+getAccessToken())
                 .build();
         Response response = client.newCall(request)
                 .execute();
@@ -97,7 +96,6 @@ public class FirebaseCloudMessageService{
 
     private String getAccessToken() throws IOException{
         String firebaseConfigPath = "firebase/"+keyName;
-
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath)
                         .getInputStream())
@@ -105,4 +103,6 @@ public class FirebaseCloudMessageService{
         googleCredentials.refreshIfExpired(); //access를 생성하기 위함.
         return googleCredentials.getAccessToken().getTokenValue();
     }
+
+
 }

@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class LoginResponseDto {
+    @Schema(description = "사용자 이름", nullable = true, example = "윤승환")
+    private String name;
     @Schema(description = "Mongle Access Token", example = "aldksfja;esoifjaslkdfaeafsdvsaer")
     private String accessToken;
     @Schema(description = "Mongle Refresh Token", example = "a;dlksfjaewovnaslkdwfeawvscvewaew")
@@ -19,7 +21,5 @@ public class LoginResponseDto {
 
     @Schema(description = "새로운 회원인지 여부, true면 새로운 회원", example = "true")
     private Boolean isNew;
-
-
 
 }

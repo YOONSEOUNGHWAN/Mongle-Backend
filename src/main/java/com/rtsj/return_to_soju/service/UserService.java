@@ -50,7 +50,7 @@ public class UserService {
             dto.setIsNew(false);
             User user = findUser.get();
             user.updateKakaoName(nickName);
-            user.updateKokaoToken(kakaoTokenDto);
+            user.updateKakaoToken(kakaoTokenDto);
 
         }else{
             dto.setIsNew(true);
@@ -67,4 +67,15 @@ public class UserService {
     }
 
 
+
+    public String getUserFcmToken(Long userId){
+        User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
+        return user.getFcmToken();
+    }
+
+    public void SaveUserFcmToken(Long userId, String fcmToken){
+        User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
+        user.setFcmToken(fcmToken);
+        return;
+    }
 }

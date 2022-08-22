@@ -4,11 +4,9 @@ import com.rtsj.return_to_soju.common.JwtProvider;
 import com.rtsj.return_to_soju.model.dto.dto.KakaoTokenDto;
 import com.rtsj.return_to_soju.model.dto.request.ReissueTokenRequestDto;
 import com.rtsj.return_to_soju.model.dto.request.UserNameRequestDto;
-import com.rtsj.return_to_soju.model.dto.response.LoginResponseDto;
-import com.rtsj.return_to_soju.model.dto.response.ReissueTokenResponseDto;
-import com.rtsj.return_to_soju.model.dto.response.SuccessResponseDto;
-import com.rtsj.return_to_soju.model.dto.response.UserInfoResponseDto;
+import com.rtsj.return_to_soju.model.dto.response.*;
 import com.rtsj.return_to_soju.repository.UserRepository;
+import com.rtsj.return_to_soju.service.FirebaseCloudMessageService;
 import com.rtsj.return_to_soju.service.OauthService;
 import com.rtsj.return_to_soju.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
 
 @Tag(name = "USER", description = "로그인 API")
 @RequiredArgsConstructor
@@ -34,6 +33,8 @@ public class UserController {
     private final OauthService oauthService;
     private final UserService userService;
     private final JwtProvider jwtProvider;
+
+    private final FirebaseCloudMessageService firebaseCloudMessageService;
 
     @Operation(summary = "로그인 API", description = "카카오 access & refresh 토큰을 사용한 회원가입 및 로그인 입니다.")
     @ApiResponses({
@@ -46,6 +47,22 @@ public class UserController {
         return ResponseEntity.ok().body(loginResponseDto);
     }
 
+    @Operation(summary = "FCM API", description = "fcm에 등록된 유저의 token을 저장합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK !!",
+                    content = @Content(schema = @Schema(implementation = SuccessResponseDto.class)))
+    })
+    @PostMapping("/users/fcm")
+    public ResponseEntity<SuccessResponseDto> setUserFcmToken(
+            HttpServletRequest request,
+            @Valid @RequestBody FcmTokenReponseDto fcmTokenReponseDto) throws IOException {
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        String fcmToken = fcmTokenReponseDto.getFcmToken();
+        userService.SaveUserFcmToken(userId, fcmToken);
+        return ResponseEntity.ok().body(new SuccessResponseDto("등록 완료!"));
+    }
+
+
 
     @Operation(summary = "이름 받기 API", description = "회원가입시 전달받은 토큰을 사용하여, 회원 이름을 등록 및 변경합니다.")
     @ApiResponses({
@@ -53,11 +70,14 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = SuccessResponseDto.class)))
     })
     @PostMapping("/users/name")
-    public ResponseEntity<SuccessResponseDto> loginWithKakao(HttpServletRequest request, @Valid @RequestBody UserNameRequestDto userNameDto){
+    public ResponseEntity<SuccessResponseDto> loginWithKakao(
+            HttpServletRequest request,
+            @Valid @RequestBody UserNameRequestDto userNameDto){
         Long userId = jwtProvider.getUserIdByHeader(request);
         String userName = userNameDto.getUserName();
         userService.saveAndUpdateUserName(userId, userName);
-        return ResponseEntity.ok(new SuccessResponseDto("변경이 완료되었습니다!"));
+        return ResponseEntity.ok()
+                .body(new SuccessResponseDto("변경이 완료되었습니다!"));
     }
 
     @Operation(summary = "사용자 정보 조회 API", description = "사용자 정보를 반환합니다.")
@@ -105,6 +125,12 @@ public class UserController {
         ReissueTokenResponseDto kakaoToken = oauthService.renewKakaoToken(request.getRefreshToken());
         return kakaoToken;
     }
+
+//    @PostMapping("/post/message")
+//    public ReissueTokenResponseDto postMessage(@RequestBody ReissueTokenRequestDto request){
+//        ReissueTokenResponseDto kakaoToken = oauthService.renewKakaoToken(request.getRefreshToken());
+//        return kakaoToken;
+//    }
 
 
 }
