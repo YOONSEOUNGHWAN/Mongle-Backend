@@ -1,13 +1,20 @@
 package com.rtsj.return_to_soju.service;
 
+import com.rtsj.return_to_soju.common.JwtProvider;
 import com.rtsj.return_to_soju.exception.NotFoundUserException;
+import com.rtsj.return_to_soju.model.dto.dto.KakaoTokenDto;
+import com.rtsj.return_to_soju.model.dto.dto.KakaoUserInfo;
+import com.rtsj.return_to_soju.model.dto.response.LoginResponseDto;
 import com.rtsj.return_to_soju.model.dto.response.UserInfoResponseDto;
 import com.rtsj.return_to_soju.model.entity.User;
+import com.rtsj.return_to_soju.model.enums.Role;
 import com.rtsj.return_to_soju.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -15,11 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final OauthService oauthService;
+    private final JwtProvider jwtProvider;
 
     @Transactional
     public void saveAndUpdateUserName(Long userId, String userName){
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
-        user.updateUserName(userName);
+        user.updateMongleName(userName);
         return;
     }
 
@@ -27,4 +36,35 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
         return new UserInfoResponseDto(user);
     }
+
+    @Transactional
+    public LoginResponseDto loginWithKakaoToken(KakaoTokenDto kakaoTokenDto) {
+        KakaoUserInfo kakaoUserInfo = oauthService.getKakaoUserInfoWithToken(kakaoTokenDto);
+        Long userId = kakaoUserInfo.getId();
+        String nickName = kakaoUserInfo.getNickName();
+
+        LoginResponseDto dto = new LoginResponseDto();
+
+        Optional<User> findUser = userRepository.findById(userId);
+        if (findUser.isPresent()) {
+            dto.setIsNew(false);
+            User user = findUser.get();
+            user.updateKakaoName(nickName);
+            user.updateKokaoToken(kakaoTokenDto);
+
+        }else{
+            dto.setIsNew(true);
+            User user = new User(userId, nickName, kakaoTokenDto, Role.ROLE_USER);
+            userRepository.save(user);
+        }
+
+        String accessToken = jwtProvider.createAccessToken(String.valueOf(userId));
+        String refreshToken = jwtProvider.createRefreshToken();
+        dto.setAccessToken(accessToken);
+        dto.setRefreshToken(refreshToken);
+
+        return dto;
+    }
+
+
 }

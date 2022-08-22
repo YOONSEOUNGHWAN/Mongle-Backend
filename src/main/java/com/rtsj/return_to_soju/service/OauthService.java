@@ -37,14 +37,6 @@ public class OauthService {
     @Value("${kakao.rest-api.key}")
     private String kakaoRestApiKey;
 
-    @Transactional
-    public LoginResponseDto loginWithKakaoToken(KakaoTokenDto kakaoTokenDto) {
-        User user = createAndUpdateKakaoUserProfileWithToken(kakaoTokenDto);
-        String accessToken = jwtProvider.createAccessToken(String.valueOf(user.getId()));
-        String refreshToken = jwtProvider.createRefreshToken();
-        return new LoginResponseDto(user, accessToken, refreshToken);
-    }
-
     /**
      * 단순히 refresh token으로 access토큰을 갱신하는 과정이며(refresh가 만료됐을 시, refresh도 재발급해준다.)
      * 이를 사용할 때, 유저의 id값에서 세팅을 다시 해줘야 한다.
@@ -68,25 +60,7 @@ public class OauthService {
                 .block();
     }
 
-    private User createAndUpdateKakaoUserProfileWithToken(KakaoTokenDto kakaoTokenDto){
-        KakaoUserInfo kakaoUserInfo = getKakaoUserInfoWithToken(kakaoTokenDto);
-        Long kakao_id = kakaoUserInfo.getId();
-        String name = kakaoUserInfo.getName();
-        String nickName = kakaoUserInfo.getNickName();
-        Optional<User> optionalUser = userRepository.findById(kakao_id);
-        if(optionalUser.isPresent()){
-            User existUser = optionalUser.get();
-            existUser.updateNickName(nickName);
-            existUser.updateKakaoAccessToken(kakaoTokenDto.getAccessToken());
-            existUser.updateKakaoRefreshToken(kakaoTokenDto.getRefreshToken());
-            return existUser;
-        }
-        User user = new User(kakao_id, name, nickName, kakaoTokenDto.getAccessToken(), kakaoTokenDto.getRefreshToken(), Role.ROLE_USER);
-        User save = userRepository.save(user);
-        return save;
-    }
-
-    private KakaoUserInfo getKakaoUserInfoWithToken(KakaoTokenDto kakaoTokenDto) {
+    public KakaoUserInfo getKakaoUserInfoWithToken(KakaoTokenDto kakaoTokenDto) {
         Map<String, Object> userAttributesByToken = getKakaoUserAttributesWithToken(kakaoTokenDto);
         KakaoUserInfo kakaoUserInfo = new KakaoUserInfo(userAttributesByToken);
         return kakaoUserInfo;

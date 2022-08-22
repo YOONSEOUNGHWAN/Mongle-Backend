@@ -13,7 +13,7 @@ public class UserInfoResponseDto {
     private String nickName;
 
     public UserInfoResponseDto(User user){
-        this.name = user.getName();
-        this.nickName = user.getNickName();
+        this.name = user.getMongleName();
+        this.nickName = user.getKakaoName();
     }
 }

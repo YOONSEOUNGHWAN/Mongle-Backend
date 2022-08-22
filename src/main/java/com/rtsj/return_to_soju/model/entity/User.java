@@ -20,8 +20,8 @@ public class User extends BaseEntity implements Persistable<Long> {
     @Id
     @Column(name = "user_id")
     private Long id; //katalk PK 값으로 매핑하기
-    private String name;
-    private String nickName;
+    private String mongleName;
+    private String kakaoName;
     private String kakaoAccessToken;
     private String kakaoRefreshToken;
     private String cloudEmail;
@@ -35,28 +35,26 @@ public class User extends BaseEntity implements Persistable<Long> {
     @OneToMany(mappedBy = "user")
     private List<Calender> calenderList = new ArrayList<>();
 
-    public User(Long id, String name, String nickName, String kakaoAccessToken, String kakaoRefreshToken,  Role role){
+    public User(Long id, String nickName, KakaoTokenDto kakaoTokenDto,  Role role){
         this.id = id;
-        this.name = name;
-        this.nickName = nickName;
-        this.kakaoAccessToken = kakaoAccessToken;
-        this.kakaoRefreshToken = kakaoRefreshToken;
+        this.kakaoName = nickName;
+        this.kakaoAccessToken = kakaoTokenDto.getAccessToken();
+        this.kakaoRefreshToken = kakaoTokenDto.getRefreshToken();
         this.role = role;
     }
     public void setKakaoUpdate(){
         this.kakaoUpdate = LocalDateTime.now();
     }
-    public void updateNickName(String nickName){
-        this.nickName = nickName;
+    public void updateKakaoName(String nickName){
+        this.kakaoName = nickName;
     }
-    public void updateUserName(String userName){this.name = userName;}
-    public void updateKakaoRefreshToken(String kakaoRefreshToken){
-        this.kakaoRefreshToken = kakaoRefreshToken;
+    public void updateMongleName(String userName){this.mongleName = userName;}
+
+    public void updateKokaoToken(KakaoTokenDto kakaoTokenDto) {
+        this.kakaoAccessToken = kakaoTokenDto.getAccessToken();
+        this.kakaoRefreshToken = kakaoTokenDto.getRefreshToken();
     }
 
-    public void updateKakaoAccessToken(String kakaoAccessToken){
-        this.kakaoAccessToken = kakaoAccessToken;
-    }
     @Override
     public boolean isNew() {
         return getCreateDate() == null;
