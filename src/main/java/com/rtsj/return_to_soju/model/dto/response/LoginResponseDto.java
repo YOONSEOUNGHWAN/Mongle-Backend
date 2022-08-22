@@ -8,8 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Schema(description = "회원가입 및 로그인 응답")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+//@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Data
+@NoArgsConstructor
 public class LoginResponseDto {
 
     @Schema(description = "사용자 kakao id값", example = "2374316219")
@@ -24,10 +25,9 @@ public class LoginResponseDto {
     @Schema(description = "새로운 회원인지 여부, true면 새로운 회원", example = "true")
     private Boolean isNew;
 
-    public LoginResponseDto(User user, Boolean isNew) {
+    public void setUserInfo(User user) {
         this.id = user.getId();
         this.kakaoName = user.getKakaoName();
-        this.isNew = isNew;
     }
 
 
