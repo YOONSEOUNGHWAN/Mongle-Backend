@@ -14,7 +14,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,17 +32,16 @@ public class FirebaseCloudMessageService{
 
     private final ObjectMapper objectMapper;
 
+    private final UserService userService;
     public void sendMessageListWithToken(List<String> fcmTokenList, String title, String body){
         List<Message> messages = fcmTokenList.stream().map(
                 token -> Message.builder()
-                        .putData("time", LocalDateTime.now().toString())
+                        .putData("date", userService.getUserMemoryDateByFcmToken(token))
                         .setNotification(new Notification(title, body))
                         .setToken(token)
                         .build())
                 .collect(Collectors.toList());
-
         BatchResponse response;
-
         try{
             response = FirebaseMessaging.getInstance().sendAll(messages);
             if(response.getFailureCount()>0){
@@ -65,6 +63,15 @@ public class FirebaseCloudMessageService{
         OkHttpClient client = new OkHttpClient();
         String message = makeMessage(targetToken, title, body);
 
+        sendMessage(client, message);
+    }
+    public void sendAnalyzeMessageTo(String targetToken, String title, String body, String date) throws IOException{
+        OkHttpClient client = new OkHttpClient();
+        String message = makeAnalyzeMessage(targetToken, title, body, date);
+        sendMessage(client, message);
+    }
+
+    private void sendMessage(OkHttpClient client, String message) throws IOException {
         RequestBody requestBody = RequestBody.create(message,
                 MediaType.get("application/json;charset=utf-8"));
         Request request = new Request.Builder()
@@ -77,22 +84,44 @@ public class FirebaseCloudMessageService{
         System.out.println(response.body().string());
     }
 
+
     private String makeMessage(String targetToken, String title, String body) throws JsonProcessingException {
         FcmMessage fcmMessage = FcmMessage.builder()
                 .message(FcmMessage.Message.builder()
                         .token(targetToken)
-                        .notification(FcmMessage.Notification.builder()
+                        .notification(
+                                FcmMessage.Notification.builder()
                                 .title(title)
                                 .body(body)
-                                .image("statics/image/행복.png")
+                                .image(null)
                                 .build()
-                        ).build()
+                        )
+                        .build()
                 )
                 .validate_only(false)
                 .build();
         return objectMapper.writeValueAsString(fcmMessage);
-
     }
+    private String makeAnalyzeMessage(String targetToken, String title, String body, String date) throws JsonProcessingException {
+        FcmMessage fcmMessage = FcmMessage.builder()
+                .message(FcmMessage.Message.builder()
+                        .token(targetToken)
+                        .notification(
+                                FcmMessage.Notification.builder()
+                                        .title(title)
+                                        .body(body)
+                                        .image(null)
+                                        .build()
+                        )
+                        .date(date)
+                        .build()
+                )
+                .validate_only(false)
+                .build();
+        return objectMapper.writeValueAsString(fcmMessage);
+    }
+
+
 
     private String getAccessToken() throws IOException{
         String firebaseConfigPath = "firebase/"+keyName;

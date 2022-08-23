@@ -10,14 +10,17 @@ public class ScheduleDto {
 
     private String name;
 
-    private LocalDateTime startTime;
+    private String calendar;
 
-    private LocalDateTime endTime;
+    private String startTime;
+
+    private String endTime;
 
     public ScheduleDto(Schedule schedule){
         this.name = schedule.getName();
-        this.startTime = schedule.getStartTime();
-        this.endTime = schedule.getEndTime();
+        this.calendar = schedule.getDomain();
+        this.startTime = schedule.getStartTime().toString();
+        this.endTime = schedule.getEndTime().toString();
     }
 
 }

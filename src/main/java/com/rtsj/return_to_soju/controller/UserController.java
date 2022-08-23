@@ -59,6 +59,8 @@ public class UserController {
         Long userId = jwtProvider.getUserIdByHeader(request);
         String fcmToken = fcmTokenReponseDto.getFcmToken();
         userService.SaveUserFcmToken(userId, fcmToken);
+        UserInfoResponseDto userInfo = userService.getUserInfo(userId);
+        firebaseCloudMessageService.sendMessageTo(fcmToken, "안녕", "hi");
         return ResponseEntity.ok().body(new SuccessResponseDto("등록 완료!"));
     }
 
@@ -125,12 +127,5 @@ public class UserController {
         ReissueTokenResponseDto kakaoToken = oauthService.renewKakaoToken(request.getRefreshToken());
         return kakaoToken;
     }
-
-//    @PostMapping("/post/message")
-//    public ReissueTokenResponseDto postMessage(@RequestBody ReissueTokenRequestDto request){
-//        ReissueTokenResponseDto kakaoToken = oauthService.renewKakaoToken(request.getRefreshToken());
-//        return kakaoToken;
-//    }
-
 
 }

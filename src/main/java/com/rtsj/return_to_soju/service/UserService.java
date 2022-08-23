@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,6 +37,11 @@ public class UserService {
     public UserInfoResponseDto getUserInfo(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
         return new UserInfoResponseDto(user);
+    }
+
+    public String getUserMemoryDateByFcmToken(String token){
+        LocalDate memoryByFcmToken = userRepository.findMemoryByFcmToken(token);
+        return memoryByFcmToken.toString();
     }
 
     @Transactional
