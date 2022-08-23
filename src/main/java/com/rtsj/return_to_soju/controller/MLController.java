@@ -32,7 +32,9 @@ public class MLController {
     public ResponseEntity<SuccessResponseResult> saveKakaoMLData(@RequestBody KakaoMLDataSaveRequestDto dto) throws IOException {
         mlService.saveKakaoMLData(dto);
         String userFcmToken = userService.getUserFcmToken(dto.getUser_pk());
-        firebaseCloudMessageService.sendMessageTo(userFcmToken, "몽글몽글", "분석이 완료됐어요~!");
+        String start_date = dto.getStart_date();
+        String end_date = dto.getEnd_date();
+        firebaseCloudMessageService.sendAnalyzeMessageTo(userFcmToken, "몽글몽글", "분석이 완료됐어요~!", start_date + "-" + end_date);
         return ResponseEntity.ok()
                 .body(new SuccessResponseResult("성공"));
     }

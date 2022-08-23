@@ -24,6 +24,8 @@ public class Schedule extends BaseEntity {
     @Column(name = "schedule_title")
     private String name;
 
+    private String domain;
+
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
