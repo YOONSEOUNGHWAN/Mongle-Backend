@@ -1,12 +1,14 @@
 package com.rtsj.return_to_soju.model.entity;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Schedule extends BaseEntity {
 
@@ -21,6 +23,8 @@ public class Schedule extends BaseEntity {
 
     @Column(name = "schedule_title")
     private String name;
+
+    private String domain;
 
     private LocalDateTime startTime;
 

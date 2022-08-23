@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 public class KakaoMLDataSaveRequestDto {
     private Long user_pk;
     private List<KakaoMLData> kakao_data;
-
+    private String start_date;
+    private String end_date;
 }
 

@@ -36,6 +36,10 @@ dependencies {
 	implementation 'com.google.firebase:firebase-admin:6.8.1'
 	//okhttp
 	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version:'4.2.2'
+
+	//m1 netty..error..?
+	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.79.Final:osx-aarch_64'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'mysql:mysql-connector-java'

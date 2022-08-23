@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 @Schema(description = "에답 정보")
 @Data
-public class ErrorResponseResult implements ResponseResult{
+public class ErrorResponseResult{
     @Schema(example = "해당 에러에 대한 내용이 나옵니다.")
     private final String message;
     public ErrorResponseResult(String message){
@@ -12,10 +12,5 @@ public class ErrorResponseResult implements ResponseResult{
     }
     public ErrorResponseResult(Exception e){
         this(e.getMessage());
-    }
-    @Schema(example = "false")
-    @Override
-    public boolean isSuccessful() {
-        return false;
     }
 }
