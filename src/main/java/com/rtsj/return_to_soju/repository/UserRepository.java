@@ -11,7 +11,7 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Long> {
 
 
-    @Query(value = "SELECT User.fcmToken FROM User", nativeQuery = true)
+    @Query(value = "SELECT rtuser.fcm_token FROM rtuser", nativeQuery = true)
     List<String> findAllFcmToken();
 
 
@@ -20,6 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "where rtuser.user_id = calender.user_id " +
             "and rtuser.fcm_token = :token " +
             "and calender.emotion ='HAPPY' " +
-            "order by Rand() LIMIT 1;",nativeQuery = true)
+            "order by Rand() LIMIT 1;", nativeQuery = true)
     LocalDate findMemoryByFcmToken(@Param("token")String token);
 }

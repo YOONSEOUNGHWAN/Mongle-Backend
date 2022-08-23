@@ -3,7 +3,10 @@ package com.rtsj.return_to_soju.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.*;
+import com.rtsj.return_to_soju.model.dto.dto.FcmAnalyzeDate;
 import com.rtsj.return_to_soju.model.dto.dto.FcmMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +16,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +40,7 @@ public class FirebaseCloudMessageService{
     public void sendMessageListWithToken(List<String> fcmTokenList, String title, String body){
         List<Message> messages = fcmTokenList.stream().map(
                 token -> Message.builder()
+                        .putData("type","gift")
                         .putData("date", userService.getUserMemoryDateByFcmToken(token))
                         .setNotification(new Notification(title, body))
                         .setToken(token)
@@ -44,6 +49,8 @@ public class FirebaseCloudMessageService{
         BatchResponse response;
         try{
             response = FirebaseMessaging.getInstance().sendAll(messages);
+            log.info("단체 알림 전송");
+            log.info(response.toString());
             if(response.getFailureCount()>0){
                 List<SendResponse> responses = response.getResponses();
                 List<String> failedTokens = new ArrayList<>();
@@ -62,11 +69,11 @@ public class FirebaseCloudMessageService{
     public void sendMessageTo(String targetToken, String title, String body) throws IOException{
         OkHttpClient client = new OkHttpClient();
         String message = makeMessage(targetToken, title, body);
-
         sendMessage(client, message);
     }
     public void sendAnalyzeMessageTo(String targetToken, String title, String body, String date) throws IOException{
         OkHttpClient client = new OkHttpClient();
+        log.info("분석 알림을 발송합니다.");
         String message = makeAnalyzeMessage(targetToken, title, body, date);
         sendMessage(client, message);
     }
@@ -81,7 +88,7 @@ public class FirebaseCloudMessageService{
                 .build();
         Response response = client.newCall(request)
                 .execute();
-        System.out.println(response.body().string());
+        log.info(response.body().string());
     }
 
 
@@ -113,7 +120,7 @@ public class FirebaseCloudMessageService{
                                         .image(null)
                                         .build()
                         )
-                        .date(date)
+                        .data(new FcmAnalyzeDate("analyze",date))
                         .build()
                 )
                 .validate_only(false)
@@ -133,5 +140,24 @@ public class FirebaseCloudMessageService{
         return googleCredentials.getAccessToken().getTokenValue();
     }
 
-
+    @PostConstruct
+    public void init(){
+        String firebaseConfigPath = "firebase/"+keyName;
+        try{
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(
+                            GoogleCredentials
+                                    .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
+                                    .createScoped(List.of(fcmScope))
+                    )
+                    .build();
+            if(FirebaseApp.getApps().isEmpty()){
+                FirebaseApp.initializeApp(options);
+                log.info("Firebase application has been initialized");
+            }
+        } catch (IOException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 }

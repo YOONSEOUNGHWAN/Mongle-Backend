@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 
 @Tag(name = "USER", description = "로그인 API")
 @RequiredArgsConstructor
@@ -33,7 +34,7 @@ public class UserController {
     private final OauthService oauthService;
     private final UserService userService;
     private final JwtProvider jwtProvider;
-
+    private final UserRepository userRepository;
     private final FirebaseCloudMessageService firebaseCloudMessageService;
 
     @Operation(summary = "로그인 API", description = "카카오 access & refresh 토큰을 사용한 회원가입 및 로그인 입니다.")
@@ -59,8 +60,6 @@ public class UserController {
         Long userId = jwtProvider.getUserIdByHeader(request);
         String fcmToken = fcmTokenReponseDto.getFcmToken();
         userService.SaveUserFcmToken(userId, fcmToken);
-        UserInfoResponseDto userInfo = userService.getUserInfo(userId);
-        firebaseCloudMessageService.sendMessageTo(fcmToken, "안녕", "hi");
         return ResponseEntity.ok().body(new SuccessResponseDto("등록 완료!"));
     }
 
@@ -128,4 +127,11 @@ public class UserController {
         return kakaoToken;
     }
 
+
+    @PostMapping("/test/gift")
+    public void test(){
+        List<String> allFcmToken = userRepository.findAllFcmToken();
+        log.info("선물하기 테스트");
+        firebaseCloudMessageService.sendMessageListWithToken(allFcmToken, "몽글몽글", "행복한 기억이 도착했어요");
+    }
 }
