@@ -36,6 +36,17 @@ jobs:
         echo "${{ secrets.PROPERTIES_SETTING_FOR_DEV }}" > ./application.properties
       shell: bash    
       
+
+    - name: make main fcm json
+      run: |
+        cd ./src/main/resources
+        mkdir firebase
+        cd ./firebase
+        touch ./monglemongle-firebase-adminsdk-zrey9-3a66b2259a.json
+        echo "${{ secrets.FIREBASE_JSON }}" > ./monglemongle-firebase-adminsdk-zrey9-3a66b2259a.json
+      shell: bash        
+      
+  
     - name: make test properties
       run: |
         cd ./src/test
