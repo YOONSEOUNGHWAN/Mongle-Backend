@@ -26,6 +26,7 @@ public class User extends BaseEntity implements Persistable<Long> {
     private String kakaoRefreshToken;
     private String cloudEmail;
     private String calenderEmail;
+    @Column(name = "fcm_token")
     private String fcmToken;
     @Enumerated(EnumType.STRING)
     private Role role;

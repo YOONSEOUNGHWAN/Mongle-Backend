@@ -11,6 +11,7 @@ import com.rtsj.return_to_soju.repository.CalenderRepository;
 import com.rtsj.return_to_soju.repository.DailySentenceRepository;
 import com.rtsj.return_to_soju.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import java.util.StringTokenizer;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 @Transactional
 public class MLService {
 
@@ -38,6 +40,7 @@ public class MLService {
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
 
         saveDailySentence(user, datas);
+        log.info("ML서버로 부터 받아온 데이터를 저장합니다.");
         calenderRepository.saveCalenderEmotionCntByNatvieQuery(userId);
         calenderRepository.saveCalenderMainEmotionByNativeQuery(userId);
     }
