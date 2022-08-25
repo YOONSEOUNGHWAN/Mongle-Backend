@@ -29,9 +29,36 @@ jobs:
         
     - name: make main properties
       run: |
-        cd ./src/main/resources
+        cd ./src/main
+        mkdir resources
+        cd ./resources
         touch ./application.properties
         echo "${{ secrets.PROPERTIES }}" > ./application.properties
+      shell: bash    
+    
+    - name: make main properties-dev
+      run: |
+        cd ./src/main/resources
+        touch ./application-dev.properties
+        echo "${{ secrets.PROPERTIES_DEV }}" > ./application-dev.properties
+      shell: bash    
+      
+    - name: make test properties
+      run: |
+        cd ./src/test
+        mkdir resources
+        cd ./resources
+        touch ./application.properties
+        echo "${{ secrets.TEST_PROPERTIES }}" > ./application.properties
+      shell: bash    
+  
+    - name: make test fcm json
+      run: |
+        cd ./src/test/resources
+        mkdir firebase
+        cd ./firebase
+        touch ./monglemongle-firebase-adminsdk-zrey9-3a66b2259a.json
+        echo "${{ secrets.FIREBASE_JSON }}" > ./monglemongle-firebase-adminsdk-zrey9-3a66b2259a.json
       shell: bash    
     
     - name: Build with Gradle

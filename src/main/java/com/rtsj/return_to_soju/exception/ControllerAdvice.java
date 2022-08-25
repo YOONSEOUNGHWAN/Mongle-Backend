@@ -17,17 +17,25 @@ public class ControllerAdvice {
             IllegalArgumentException.class,
             WebClientResponseException.class,
             NotFoundUserException.class,
-            JwtException.class,
             NoDataUploadedException.class,
-//            RuntimeException.class,
-
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ErrorResponseResult exceptionHandler(HttpServletRequest request, Exception e) {
         return new ErrorResponseResult(e);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({
+            JwtException.class,
+            InvalidTokenException.class,
+    })
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected ErrorResponseResult authorizedExceptionHandler(HttpServletRequest request, Exception e) {
+        return new ErrorResponseResult(e);
+    }
+
+    @ExceptionHandler(
+            MethodArgumentNotValidException.class
+    )
     public ErrorResponseResult handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         String errorMessage = e.getBindingResult()
                 .getAllErrors()

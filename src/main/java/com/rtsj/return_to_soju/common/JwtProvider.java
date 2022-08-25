@@ -2,6 +2,7 @@ package com.rtsj.return_to_soju.common;
 
 
 import com.rtsj.return_to_soju.common.auth.CustomJwtUserDetailsService;
+import com.rtsj.return_to_soju.exception.InvalidTokenException;
 import com.rtsj.return_to_soju.model.dto.request.ReissueTokenRequestDto;
 import com.rtsj.return_to_soju.model.dto.response.ReissueTokenResponseDto;
 import io.jsonwebtoken.*;
@@ -66,7 +67,7 @@ public class JwtProvider {
         }catch (ExpiredJwtException e){
             return e.getClaims().getSubject();
         }catch (JwtException e){
-            throw new RuntimeException("유효하지 않은 토큰입니다.");
+            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
         }
     }
 
@@ -86,8 +87,8 @@ public class JwtProvider {
         return new UsernamePasswordAuthenticationToken(userDetails,"",userDetails.getAuthorities());
     }
 
-    public Long getUserIdByToken(HttpServletRequest request) {
-        String token = request.getHeader("X-AUTH-TOKEN");
+    public Long getUserIdByHeader(HttpServletRequest request) {
+        String token = this.resolveToken(request);
         String userId = this.getPayload(token);
         return Long.parseLong(userId);
     }

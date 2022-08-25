@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Slf4j
 public class AwsController {
 
     private final S3Service s3Service;
@@ -38,7 +40,8 @@ public class AwsController {
     )
     @PostMapping("/s3/kakao")
     public ResponseEntity uploadKakaoText(@ModelAttribute UploadKakaoTextDto dto, HttpServletRequest request) {
-        Long userId = jwtProvider.getUserIdByToken(request);
+        log.info("카카오톡 txt 업로드 컨트롤러 시작");
+        Long userId = jwtProvider.getUserIdByHeader(request);
         s3Service.uploadKakaoFile(dto.getFiles(), userId);
 
         return ResponseEntity.created(URI.create("/api/s3/kakao/"))
