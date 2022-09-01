@@ -65,6 +65,15 @@ public class FirebaseCloudMessageService{
             log.error("Cannot send to memberList push message. error info : {}", e.getMessage());
         }
     }
+//    public void sendMessageSDK(String targetToken, String title, String body) throws FirebaseMessagingException {
+//        Message message = Message.builder()
+//                .putData("type", "value")
+//                .putData("data", "value 2")
+//                .setNotification(new Notification(title, body))
+//                .setToken(targetToken)
+//                .build();
+//        FirebaseMessaging.getInstance().send(message);
+//
 
     public void sendMessageTo(String targetToken, String title, String body) throws IOException{
         OkHttpClient client = new OkHttpClient();
