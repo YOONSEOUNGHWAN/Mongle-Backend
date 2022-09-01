@@ -93,7 +93,7 @@ public class CalenderService {
 
     }
 
-
+    @Transactional
     public CalenderByDayDto getDailyDataFromUser(Long userId, String year, String month, String day) {
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
         LocalDate localDate = this.createLocalDateWithString(year, month, day);
