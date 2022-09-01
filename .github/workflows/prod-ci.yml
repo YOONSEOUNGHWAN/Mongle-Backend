@@ -29,17 +29,9 @@ jobs:
         echo "${{ secrets.PROPERTIES_PROD }}" ./application.properties
       shell: bash
     
-    - name: make test properties
+    - name: make main fcm json
       run: |
-        cd ./src/test/
-        mkdir resources
-        cd ./resources
-        touch ./application.properties
-        echo "${{ secrets.TEST_PROPERTIES }}" > ./application.properties
-      shell: bash
-    - name: make test fcm json
-      run: |
-        cd ./src/test/resources
+        cd ./src/main/resources
         mkdir firebase
         cd ./firebase
         touch ./monglemongle-firebase-adminsdk-zrey9-3a66b2259a.json
