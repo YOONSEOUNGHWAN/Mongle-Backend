@@ -19,6 +19,7 @@ import org.codehaus.jackson.annotate.JsonValue;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +41,9 @@ public class CalenderService {
     private final CalenderRepository calenderRepository;
     private final UserRepository userRepository;
     private final DailySentenceRepository dailySentenceRepository;
+    @Value("${mongle.ml.chatbot.url}")
+    public String chatbotURL;
+
     @Transactional //User의 정보를 가져오는데 사용됨.. 추가로, UserRepository에서 캘린더를 빼오면 어떨까... 성능측면에서는 비슷해 보이는뎅..
     public List<CalenderBetweenMonthResponseDto> getEmotionBetweenMonth(Long userId, String start, String end) {
         String[] startDate = start.split("-");
@@ -76,7 +80,7 @@ public class CalenderService {
     private String getDiaryFeedbackFromMLServer(String diary) throws WebClientResponseException, IOException, ParseException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-        String urlParam = "http://3.36.119.134:5000/chatbot/b?s="+diary;
+        String urlParam = chatbotURL+diary;
         Request request = new Request.Builder()
                 .url(urlParam)
                 .build();
