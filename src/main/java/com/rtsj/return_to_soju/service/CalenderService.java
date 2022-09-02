@@ -1,5 +1,7 @@
 package com.rtsj.return_to_soju.service;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.rtsj.return_to_soju.exception.NotFoundUserException;
 import com.rtsj.return_to_soju.model.dto.response.CalenderBetweenMonthResponseDto;
 import com.rtsj.return_to_soju.model.dto.response.CalenderByDayDto;
@@ -12,12 +14,21 @@ import com.rtsj.return_to_soju.repository.CalenderRepository;
 import com.rtsj.return_to_soju.repository.DailySentenceRepository;
 import com.rtsj.return_to_soju.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import okhttp3.*;
+import org.codehaus.jackson.annotate.JsonValue;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -52,15 +63,31 @@ public class CalenderService {
     }
 
     @Transactional
-    public void createDiary(Long userId, String year, String month, String day, String diaryText) {
+    public void createDiary(Long userId, String year, String month, String day, String diaryText) throws IOException, ParseException {
         LocalDate localDate = this.createLocalDateWithString(year, month, day);
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
-
         Calender calender = findCalenderByUserAndLocalDate(user, localDate);
-
+        String diaryFeedbackFromMLServer = getDiaryFeedbackFromMLServer(diaryText);
         calender.writeOrUpdateDiary(diaryText);
+        calender.writeOrUpdateDiaryFeedback(diaryFeedbackFromMLServer);
         calenderRepository.save(calender);
     }
+
+    private String getDiaryFeedbackFromMLServer(String diary) throws WebClientResponseException, IOException, ParseException {
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        String urlParam = "http://3.36.119.134:5000/chatbot/b?s="+diary;
+        Request request = new Request.Builder()
+                .url(urlParam)
+                .build();
+        Response response = client.newCall(request).execute();
+        String string = response.body().string();
+        JSONParser jsonParser = new JSONParser();
+        JSONObject parse = (JSONObject) jsonParser.parse(string);
+        return parse.get("answer").toString();
+    }
+
+
 
     // 유저와 yyyy-mm-dd로 캘린더를 찾는 로직
     // if 캘린더가 없으면 만들어서 리턴

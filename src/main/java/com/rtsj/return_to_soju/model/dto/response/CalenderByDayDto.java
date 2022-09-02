@@ -16,6 +16,7 @@ public class CalenderByDayDto {
 
     private List<ImageDto> imageList = new ArrayList<>();
     private String diary;
+    private String diaryFeedback;
     private List<ScheduleDto> scheduleList = new ArrayList<>();
     private List<EmotionWithPercentDto> emotionList = new ArrayList<>();
 
@@ -25,6 +26,7 @@ public class CalenderByDayDto {
                 .map(ImageDto::new)
                 .collect(Collectors.toList());
         this.diary = calender.getDiary();
+        this.diaryFeedback = calender.getDiaryFeedback();
         this.scheduleList = calender.getScheduleList().stream()
                 .map(ScheduleDto::new)
                 .collect(Collectors.toList());

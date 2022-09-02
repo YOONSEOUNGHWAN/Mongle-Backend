@@ -17,10 +17,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -95,7 +97,7 @@ public class CalenderController {
             @PathVariable(name = "day") String day,
             @RequestBody WriteDiaryDto dto,
             HttpServletRequest request
-    ) {
+    ) throws IOException, ParseException {
         Long userId = jwtProvider.getUserIdByHeader(request);
         String diaryText = dto.getText();
         calenderService.createDiary(userId, year, month, day, diaryText);
