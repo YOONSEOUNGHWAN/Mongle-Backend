@@ -2,6 +2,7 @@ package com.rtsj.return_to_soju.service;
 
 import com.rtsj.return_to_soju.exception.NotFoundUserException;
 import com.rtsj.return_to_soju.model.dto.dto.KakaoMLData;
+import com.rtsj.return_to_soju.model.dto.dto.KakaoTokenDto;
 import com.rtsj.return_to_soju.model.dto.request.KakaoMLDataSaveRequestDto;
 import com.rtsj.return_to_soju.model.entity.Calender;
 import com.rtsj.return_to_soju.model.entity.DailySentence;
@@ -12,15 +13,19 @@ import com.rtsj.return_to_soju.repository.DailySentenceRepository;
 import com.rtsj.return_to_soju.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import javax.persistence.NonUniqueResultException;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 @RequiredArgsConstructor
@@ -44,6 +49,7 @@ public class MLService {
         calenderRepository.saveCalenderEmotionCntByNatvieQuery(userId);
         calenderRepository.saveCalenderMainEmotionByNativeQuery(userId);
     }
+
 
     // 매번 calender를 찾는 쿼리문이 나감,,, 수정할 방법을 찾고싶은데 모르겠다..
     private void saveDailySentence(User user, List<KakaoMLData> datas) {

@@ -65,11 +65,13 @@ public class UserService {
             User user = new User(userId, nickName, kakaoTokenDto, Role.ROLE_USER);
             userRepository.save(user);
         }
-
         String accessToken = jwtProvider.createAccessToken(String.valueOf(userId));
         String refreshToken = jwtProvider.createRefreshToken();
         dto.setAccessToken(accessToken);
         dto.setRefreshToken(refreshToken);
+        dto.setAccessExpiredAt(jwtProvider.getExpirationDate(accessToken));
+        dto.setRefreshExpiredAt(jwtProvider.getExpirationDate(refreshToken));
+        dto.setTokenType("Bearer");
 
         return dto;
     }
