@@ -27,6 +27,7 @@ public class Calender extends BaseEntity {
     private Emotion emotion;
     @Lob
     private String diary;
+    private String diaryFeedback;
     @OneToMany(mappedBy = "calender")
     private List<Schedule> scheduleList = new ArrayList<>();
     @OneToMany(mappedBy = "calender")
@@ -63,6 +64,9 @@ public class Calender extends BaseEntity {
 
     public void writeOrUpdateDiary(String diary) {
         this.diary = diary;
+    }
+    public void writeOrUpdateDiaryFeedback(String diaryFeedback) {
+        this.diaryFeedback = diaryFeedback;
     }
 
 }
