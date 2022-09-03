@@ -33,7 +33,7 @@ jobs:
         mkdir resources
         cd ./resources
         touch ./application.properties
-        echo "${{ secrets.PROPERTIES_SETTING_FOR_DEV }}" > ./application.properties
+        echo "${{ secrets.PROPERTIES_DEV }}" > ./application.properties
       shell: bash    
       
 
