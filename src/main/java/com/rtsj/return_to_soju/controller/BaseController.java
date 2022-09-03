@@ -14,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class BaseController {
-
     @GetMapping("/")
     public ResponseEntity healthCheck(
     ) {
