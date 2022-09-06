@@ -69,4 +69,7 @@ public class Calender extends BaseEntity {
         this.diaryFeedback = diaryFeedback;
     }
 
+    public void addTopic(DailyTopic dailyTopic) {
+        this.topicList.add(dailyTopic);
+    }
 }

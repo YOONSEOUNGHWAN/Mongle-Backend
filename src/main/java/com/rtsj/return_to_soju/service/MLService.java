@@ -6,10 +6,12 @@ import com.rtsj.return_to_soju.model.dto.dto.KakaoTokenDto;
 import com.rtsj.return_to_soju.model.dto.request.KakaoMLDataSaveRequestDto;
 import com.rtsj.return_to_soju.model.entity.Calender;
 import com.rtsj.return_to_soju.model.entity.DailySentence;
+import com.rtsj.return_to_soju.model.entity.DailyTopic;
 import com.rtsj.return_to_soju.model.entity.User;
 import com.rtsj.return_to_soju.model.enums.Emotion;
 import com.rtsj.return_to_soju.repository.CalenderRepository;
 import com.rtsj.return_to_soju.repository.DailySentenceRepository;
+import com.rtsj.return_to_soju.repository.DailyTopicRepository;
 import com.rtsj.return_to_soju.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +23,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -38,13 +44,15 @@ public class MLService {
     private final UserRepository userRepository;
     private final DailySentenceRepository dailySentenceRepository;
     private final CalenderService calenderService;
+    private final DailyTopicRepository dailyTopicRepository;
 
     public void saveKakaoMLData(KakaoMLDataSaveRequestDto dto) {
         Long userId = dto.getUser_pk();
         List<KakaoMLData> datas = dto.getKakao_data();
+        Map<String, List<String>> keyword = dto.getKeyword();
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
-
         saveDailySentence(user, datas);
+        saveDailyTopic(user, dto.getKeyword());
         log.info("ML서버로 부터 받아온 데이터를 저장합니다.");
         calenderRepository.saveCalenderEmotionCntByNatvieQuery(userId);
         calenderRepository.saveCalenderMainEmotionByNativeQuery(userId);
@@ -56,73 +64,46 @@ public class MLService {
         datas.stream()
                 .forEach(data -> {
                     String time = data.getDate_time();
-                    LocalDateTime localDateTime = convertStringTimeToLocalDateTimeFormat(time);
-                    LocalDate localDate = localDateTime.toLocalDate();
-
-                    Calender calender = calenderService.findCalenderByUserAndLocalDate(user, localDate);
-
-                    String sentence = data.getText();
-                    Emotion emotion = data.getEmotion();
-                    //todo Roomname, kakaoText 넣어줘야함
-                    // 1. roomname 구현이 가능할진 모르겠음
-                    // 2. kakaoText: 본문 파일을 알아야 당일 카톡보기를 구현햘 수 있음
-                    // but 현재 이걸 어떻게 구현할지 논의해야
-                    // 3. 사용자가 톡방을 한번 더 올렸을 때 중복검사 로직이 없음
-
-                    DailySentence dailySentence = new DailySentence(calender, sentence, emotion);
-                    dailySentenceRepository.save(dailySentence);
+                    LocalDate localDate = null;
+                    try {
+                        //todo Roomname, kakaoText 넣어줘야함
+                        // 1. roomname 구현이 가능할진 모르겠음
+                        // 2. kakaoText: 본문 파일을 알아야 당일 카톡보기를 구현햘 수 있음
+                        // but 현재 이걸 어떻게 구현할지 논의해야
+                        // 3. 사용자가 톡방을 한번 더 올렸을 때 중복검사 로직이 없음
+                        localDate = convertStringToLocalDate(time);
+                        Calender calender = calenderService.findCalenderByUserAndLocalDate(user, localDate);
+                        String sentence = data.getText();
+                        Emotion emotion = data.getEmotion();
+                        DailySentence dailySentence = new DailySentence(calender, sentence, emotion);
+                        dailySentenceRepository.save(dailySentence);
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
     }
-
-
-
-    private LocalDateTime convertStringTimeToLocalDateTimeFormat(String origin) {
-        StringTokenizer st = new StringTokenizer(origin);
-
-        String year = st.nextToken();
-        String month = st.nextToken();
-        String day = st.nextToken();
-        String ampm = st.nextToken();
-        String time = st.nextToken();
-
-        year = year.substring(0, 4);
-        year += "-";
-
-        month = month.replaceAll("[^0-9]","");
-        if (month.length() == 1) {
-            month = "0" + month;
-        }
-        month += "-";
-
-        day = day.replaceAll("일", "");
-        if (day.length() == 1) {
-            day = "0" + day;
-        }
-
-        boolean isAm = ampm.equals("오전");
-
-        st = new StringTokenizer(time, ":");
-
-        int intHour = Integer.parseInt(st.nextToken());
-
-        if (intHour % 12 == 0) {
-            intHour -= 12;
-        }
-        if (!isAm) {
-            intHour += 12;
-        }
-
-        String hour = intHour + "";
-
-        if (hour.length() == 1) {
-            hour = "0" + hour;
-        }
-
-        String min = st.nextToken();
-
-        String convertString = year + month + day + " " + hour + ":" + min;
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return LocalDateTime.parse(convertString, formatter);
+    private void saveDailyTopic(User user, Map<String, List<String>> keyword){
+        DateFormat df = new SimpleDateFormat("yyyy년 MM월 dd일");
+        keyword.forEach((key, value) -> {
+            try {
+                Date parse = df.parse(key);
+                LocalDate date = new java.sql.Date(parse.getTime()).toLocalDate();
+                Calender calender = calenderService.findCalenderByUserAndLocalDate(user, date);
+                value.forEach(topic -> {
+                    DailyTopic dailyTopic = new DailyTopic(calender, topic);
+                    dailyTopicRepository.save(dailyTopic);
+                });
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
+    private LocalDate convertStringToLocalDate(String stringDate) throws ParseException {
+        DateFormat df = new SimpleDateFormat("yyyy년 MM월 dd일 a HH:mm");
+        Date parse = df.parse(stringDate);
+        LocalDate localDate = new java.sql.Date(parse.getTime()).toLocalDate();
+        return localDate;
+
+    }
+
 }

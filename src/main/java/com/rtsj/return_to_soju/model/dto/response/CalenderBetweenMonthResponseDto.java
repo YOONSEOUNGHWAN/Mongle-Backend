@@ -17,10 +17,11 @@ public class CalenderBetweenMonthResponseDto {
     private LocalDate date;
     @Schema(example = "감정")
     private Emotion emotion;
-    private List<String> subjectList = new ArrayList<>();
+    private List<String> subjectList;
 
     public CalenderBetweenMonthResponseDto(Calender calender) {
         this.date = calender.getDate();
         this.emotion = calender.getEmotion();
+        this.subjectList = (List<String>) calender.getTopicList().stream().map(data -> data.getName());
     }
 }
