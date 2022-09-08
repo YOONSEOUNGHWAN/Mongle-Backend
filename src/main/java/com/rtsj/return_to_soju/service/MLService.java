@@ -48,11 +48,11 @@ public class MLService {
 
     public void saveKakaoMLData(KakaoMLDataSaveRequestDto dto) {
         Long userId = dto.getUser_pk();
-        List<KakaoMLData> datas = dto.getKakao_data();
+        List<KakaoMLData> data = dto.getKakao_data();
         Map<String, List<String>> keyword = dto.getKeyword();
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
-        saveDailySentence(user, datas);
-        saveDailyTopic(user, dto.getKeyword());
+        saveDailySentence(user, data);
+        saveDailyTopic(user, keyword);
         log.info("ML서버로 부터 받아온 데이터를 저장합니다.");
         calenderRepository.saveCalenderEmotionCntByNatvieQuery(userId);
         calenderRepository.saveCalenderMainEmotionByNativeQuery(userId);
