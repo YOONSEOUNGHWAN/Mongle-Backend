@@ -23,10 +23,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -79,7 +76,7 @@ public class MLService {
                 });
     }
     private void saveDailyTopic(User user, Map<String, List<String>> keyword){
-        DateFormat df = new SimpleDateFormat("yyyy년 MM월 dd일");
+        DateFormat df = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREAN);
         keyword.forEach((key, value) -> {
             try {
                 Date parse = df.parse(key);
@@ -95,11 +92,10 @@ public class MLService {
         });
     }
     private LocalDate convertStringToLocalDate(String stringDate) throws ParseException {
-        DateFormat df = new SimpleDateFormat("yyyy년 MM월 dd일 a HH:mm");
+        DateFormat df = new SimpleDateFormat("yyyy년 MM월 dd일 a HH:mm", Locale.KOREAN);
         Date parse = df.parse(stringDate);
         LocalDate localDate = new java.sql.Date(parse.getTime()).toLocalDate();
         return localDate;
-
     }
 
 }
