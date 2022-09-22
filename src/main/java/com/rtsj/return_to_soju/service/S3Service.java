@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.rtsj.return_to_soju.exception.NotFoundUserException;
+import com.rtsj.return_to_soju.model.entity.KakaoRoom;
 import com.rtsj.return_to_soju.model.entity.KakaoText;
 import com.rtsj.return_to_soju.model.entity.User;
 import com.rtsj.return_to_soju.repository.KakaoTextRepository;
@@ -18,11 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -36,20 +38,28 @@ public class S3Service {
     private final UserRepository userRepository;
     private final KakaoTextRepository kakaoTextRepository;
 
-    public List<String> uploadFile(List<MultipartFile> files, String prefix, String dirname, String suffix) {
+    private final String target = "카카오톡 대화";
+
+
+    public List<String> uploadFile(List<MultipartFile> files, String prefix, String dirname, String suffix, User user) {
         log.info("S3 파일올리는 로직 시작");
         List<String> fileNameList = new ArrayList<>();
         files.stream()
                 .forEach(file -> {
-                    String fileName = dirname + "/" + prefix + UUID.randomUUID() + suffix;
+                    String kakaoRoomName;
+                    try {
+                        kakaoRoomName = getKakaoRoomName(file);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    String fileName = dirname + "/" + prefix + kakaoRoomName + "-" + UUID.randomUUID() + suffix;
                     ObjectMetadata objectMetadata = new ObjectMetadata();
                     objectMetadata.setContentLength(file.getSize());
                     objectMetadata.setContentType(file.getContentType());
-
-                    try(InputStream inputStream = file.getInputStream()) {
+                    try (InputStream inputStream = checkDuplicateFile(file, user)) {
                         amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                                 .withCannedAcl(CannedAccessControlList.PublicRead));
-                    } catch(IOException e) {
+                    } catch (IOException e) {
                         throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
                     }
 
@@ -57,6 +67,40 @@ public class S3Service {
                 });
         log.info("S3 파일올리는 로직 완료");
         return fileNameList;
+    }
+
+    private String getKakaoRoomName(MultipartFile file) throws IOException {
+        InputStream inputStream = file.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+        String data = br.readLine();
+        String roomName = data.split(target)[0].strip();
+        br.close();
+        return roomName;
+    }
+
+    private InputStream checkDuplicateFile(MultipartFile file, User user) throws IOException {
+        String roomName = getKakaoRoomName(file);
+//        boolean b = user.getRoomList().stream().anyMatch(room -> room.getRoomName().equals(roomName));
+        List<String> collect = user.getRoomList().stream().map(KakaoRoom::getRoomName).collect(Collectors.toList());
+        // 중복 된 파일
+        if(collect.contains(roomName)){
+            int i = collect.indexOf(roomName);
+            KakaoRoom kakaoRoom = user.getRoomList().get(i);
+            String lastDateTime = kakaoRoom.getLastDateTime();
+
+            InputStream inputStream = file.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            while(!br.readLine().contains(lastDateTime));
+            String memory = null;
+            String line;
+            while((line=br.readLine()) != null){
+                memory += line+'\n';
+            }
+            InputStream in = new ByteArrayInputStream(memory.getBytes(StandardCharsets.UTF_8));
+            br.close();
+            return in;
+        }
+        return file.getInputStream();
     }
 
 
@@ -69,7 +113,7 @@ public class S3Service {
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
         String prefix = user.getId() + "-" + user.getKakaoName() + "-";
 
-        List<String> urls = this.uploadFile(files, prefix, "origin", ".txt");
+        List<String> urls = this.uploadFile(files, prefix, "origin", ".txt", user);
         urls.stream()
                 .forEach(url -> {
                     KakaoText kakaoText = new KakaoText(url, user);

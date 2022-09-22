@@ -4,15 +4,9 @@ import com.rtsj.return_to_soju.exception.NotFoundUserException;
 import com.rtsj.return_to_soju.model.dto.dto.KakaoMLData;
 import com.rtsj.return_to_soju.model.dto.dto.KakaoTokenDto;
 import com.rtsj.return_to_soju.model.dto.request.KakaoMLDataSaveRequestDto;
-import com.rtsj.return_to_soju.model.entity.Calender;
-import com.rtsj.return_to_soju.model.entity.DailySentence;
-import com.rtsj.return_to_soju.model.entity.DailyTopic;
-import com.rtsj.return_to_soju.model.entity.User;
+import com.rtsj.return_to_soju.model.entity.*;
 import com.rtsj.return_to_soju.model.enums.Emotion;
-import com.rtsj.return_to_soju.repository.CalenderRepository;
-import com.rtsj.return_to_soju.repository.DailySentenceRepository;
-import com.rtsj.return_to_soju.repository.DailyTopicRepository;
-import com.rtsj.return_to_soju.repository.UserRepository;
+import com.rtsj.return_to_soju.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -45,6 +39,7 @@ public class MLService {
     private final DailySentenceRepository dailySentenceRepository;
     private final CalenderService calenderService;
     private final DailyTopicRepository dailyTopicRepository;
+    private final KakaoRoomRepository kakaoRoomRepository;
 
     public void saveKakaoMLData(KakaoMLDataSaveRequestDto dto) {
         Long userId = dto.getUser_pk();
@@ -54,6 +49,7 @@ public class MLService {
         saveDailySentence(user, data);
         saveDailyTopic(user, keyword);
         log.info("ML서버로 부터 받아온 데이터를 저장합니다.");
+        kakaoRoomRepository.save(new KakaoRoom(user, dto.getRoomName(), dto.getEnd_date()));
         calenderRepository.saveCalenderEmotionCntByNatvieQuery(userId);
         calenderRepository.saveCalenderMainEmotionByNativeQuery(userId);
     }
