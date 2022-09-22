@@ -81,6 +81,9 @@ public class S3Service {
     private InputStream checkDuplicateFile(MultipartFile file, User user) throws IOException {
         String roomName = getKakaoRoomName(file);
 //        boolean b = user.getRoomList().stream().anyMatch(room -> room.getRoomName().equals(roomName));
+        if(user.getRoomList().isEmpty()){
+            return file.getInputStream();
+        }
         List<String> collect = user.getRoomList().stream().map(KakaoRoom::getRoomName).collect(Collectors.toList());
         // 중복 된 파일
         if(collect.contains(roomName)){
