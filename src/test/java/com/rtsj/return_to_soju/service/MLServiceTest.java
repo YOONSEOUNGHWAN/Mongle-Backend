@@ -24,4 +24,12 @@ class MLServiceTest {
         return localDate;
     }
 
+    @Test
+    public void test2(){
+        String data = "소마 팀 3 카카오톡 대화";
+        String target = "카카오톡 대화";
+        String[] split = data.split(target);
+        System.out.println(split[0]);
+    }
+
 }
