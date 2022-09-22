@@ -17,15 +17,12 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends GenericFilter {
     private final JwtProvider jwtProvider;
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String token = resolveToken((HttpServletRequest) request);
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException{
+        String token = jwtProvider.resolveToken((HttpServletRequest) request);
         if(token != null && jwtProvider.validateToken(token)){
             Authentication authentication = jwtProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         chain.doFilter(request, response);
-    }
-    private String resolveToken(HttpServletRequest request){
-        return request.getHeader("X-AUTH-TOKEN");
     }
 }

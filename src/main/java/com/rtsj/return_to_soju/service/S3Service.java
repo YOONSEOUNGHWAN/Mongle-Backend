@@ -10,6 +10,7 @@ import com.rtsj.return_to_soju.model.entity.User;
 import com.rtsj.return_to_soju.repository.KakaoTextRepository;
 import com.rtsj.return_to_soju.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class S3Service {
@@ -34,11 +36,12 @@ public class S3Service {
     private final UserRepository userRepository;
     private final KakaoTextRepository kakaoTextRepository;
 
-    public List<String> uploadFile(List<MultipartFile> files, String prefix, String dirname) {
+    public List<String> uploadFile(List<MultipartFile> files, String prefix, String dirname, String suffix) {
+        log.info("S3 파일올리는 로직 시작");
         List<String> fileNameList = new ArrayList<>();
         files.stream()
                 .forEach(file -> {
-                    String fileName = dirname + "/" + prefix + UUID.randomUUID();
+                    String fileName = dirname + "/" + prefix + UUID.randomUUID() + suffix;
                     ObjectMetadata objectMetadata = new ObjectMetadata();
                     objectMetadata.setContentLength(file.getSize());
                     objectMetadata.setContentType(file.getContentType());
@@ -52,6 +55,7 @@ public class S3Service {
 
                     fileNameList.add(fileName);
                 });
+        log.info("S3 파일올리는 로직 완료");
         return fileNameList;
     }
 
@@ -63,13 +67,14 @@ public class S3Service {
     public void uploadKakaoFile(List<MultipartFile> files, Long userId) {
         // 이 에러가 발생할 확률이 사실상 없지만 만약 발생하게 된다면 400번으로 나가는데 이게 옳을까..?
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
-        String prefix = user.getId() + "-" + user.getNickName() + "-";
+        String prefix = user.getId() + "-" + user.getKakaoName() + "-";
 
-        List<String> urls = this.uploadFile(files, prefix, "OriginText");
+        List<String> urls = this.uploadFile(files, prefix, "origin", ".txt");
         urls.stream()
                 .forEach(url -> {
                     KakaoText kakaoText = new KakaoText(url, user);
                     kakaoTextRepository.save(kakaoText);
                 });
+        log.info(userId+ "유저가 kakao 파일을 성공적으로 올렸습니다.");
     }
 }

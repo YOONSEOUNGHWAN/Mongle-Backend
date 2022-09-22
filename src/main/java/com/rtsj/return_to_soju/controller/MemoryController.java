@@ -24,6 +24,7 @@ public class MemoryController {
             @ApiResponse(responseCode = "200", description = "요청 성공",
              content = @Content(schema = @Schema(implementation = CalenderIdWithDateDto.class)))
     })
+
     @GetMapping("/memory/new")
     public void getRandomMemory() {
 

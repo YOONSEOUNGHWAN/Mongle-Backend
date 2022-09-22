@@ -1,11 +1,14 @@
 package com.rtsj.return_to_soju.model.entity;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DailyTopic extends BaseEntity {
 
@@ -20,4 +23,10 @@ public class DailyTopic extends BaseEntity {
 
     @Column(name = "topic_name")
     private String name;
+    public DailyTopic(Calender calender, String topic){
+        this.calender = calender;
+        this.name = topic;
+        calender.addTopic(this);
+    }
+
 }
