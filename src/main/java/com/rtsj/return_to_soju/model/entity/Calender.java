@@ -30,9 +30,9 @@ public class Calender extends BaseEntity {
     private String diaryFeedback;
     @OneToMany(mappedBy = "calender")
     private List<Schedule> scheduleList = new ArrayList<>();
-    @OneToMany(mappedBy = "calender")
+    @OneToMany(mappedBy = "calender", cascade = CascadeType.ALL)
     private List<DailySentence> dailySentenceList = new ArrayList<>();
-    @OneToMany(mappedBy = "calender")
+    @OneToMany(mappedBy = "calender", cascade = CascadeType.ALL)
     private List<DailyTopic> topicList = new ArrayList<>();
     @OneToMany(mappedBy = "calender")
     private List<ImageFile> imageList = new ArrayList<>();
