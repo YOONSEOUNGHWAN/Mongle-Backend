@@ -4,13 +4,13 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.rtsj.return_to_soju.exception.NotFoundCalenderException;
 import com.rtsj.return_to_soju.exception.NotFoundUserException;
+import com.rtsj.return_to_soju.model.entity.Calender;
 import com.rtsj.return_to_soju.model.entity.KakaoRoom;
 import com.rtsj.return_to_soju.model.entity.KakaoText;
 import com.rtsj.return_to_soju.model.entity.User;
-import com.rtsj.return_to_soju.repository.CalenderRepository;
-import com.rtsj.return_to_soju.repository.KakaoTextRepository;
-import com.rtsj.return_to_soju.repository.UserRepository;
+import com.rtsj.return_to_soju.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +40,8 @@ public class S3Service {
     private final UserRepository userRepository;
     private final KakaoTextRepository kakaoTextRepository;
     private final CalenderRepository calenderRepository;
+    private final DailySentenceRepository dailySentenceRepository;
+    private final DailyTopicRepository dailyTopicRepository;
 
     private final String target = "카카오톡 대화";
 
@@ -84,9 +86,11 @@ public class S3Service {
         return roomName;
     }
 
-    private void deleteCalenderData(String date) throws ParseException {
+    private void deleteDailySentenceAndTopicByDateAndRoom(User user, String date, String roomName) throws ParseException {
         LocalDate localDate = convertStringToLocalDate(date);
-        calenderRepository.deleteAllByDate(localDate);
+        Calender calender = calenderRepository.findByUserAndDate(user, localDate).orElseThrow(NotFoundCalenderException::new);
+        dailyTopicRepository.deleteAllByCalenderAndRoomName(calender, roomName);
+        dailySentenceRepository.deleteAllByCalenderAndRoomName(calender, roomName);
     }
 
     private InputStream checkDuplicateFile(MultipartFile file, User user) throws IOException, ParseException {
@@ -118,7 +122,7 @@ public class S3Service {
             InputStream in = new ByteArrayInputStream(memory.getBytes(StandardCharsets.UTF_8));
             br.close();
 
-            deleteCalenderData(kakaoRoom.getLastDateTime());
+            deleteDailySentenceAndTopicByDateAndRoom(user, kakaoRoom.getLastDateTime(), kakaoRoom.getRoomName());
             return in;
         }
         return file.getInputStream();

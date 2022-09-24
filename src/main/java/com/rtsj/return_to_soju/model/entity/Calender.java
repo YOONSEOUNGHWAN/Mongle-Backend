@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -34,6 +35,12 @@ public class Calender extends BaseEntity {
     private List<DailySentence> dailySentenceList = new ArrayList<>();
     @OneToMany(mappedBy = "calender", cascade = CascadeType.ALL)
     private List<DailyTopic> topicList = new ArrayList<>();
+
+    public List<DailyTopic> getTopicList() {
+        Collections.shuffle(topicList);
+        return topicList;
+    }
+
     @OneToMany(mappedBy = "calender")
     private List<ImageFile> imageList = new ArrayList<>();
     private Integer happy;

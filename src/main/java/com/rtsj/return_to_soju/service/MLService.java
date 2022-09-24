@@ -43,8 +43,8 @@ public class MLService {
         List<KakaoMLData> data = dto.getKakao_data();
         Map<String, List<String>> keyword = dto.getKeyword();
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
-        saveDailySentence(user, data);
-        saveDailyTopic(user, keyword);
+        saveDailySentence(user, data, dto.getRoomName());
+        saveDailyTopic(user, keyword, dto.getRoomName());
         log.info("ML서버로 부터 받아온 데이터를 저장합니다.");
         kakaoRoomRepository.save(new KakaoRoom(user, dto.getRoomName(), dto.getEnd_date()));
         calenderRepository.saveCalenderEmotionCntByNatvieQuery(userId);
@@ -53,7 +53,7 @@ public class MLService {
 
 
     // 매번 calender를 찾는 쿼리문이 나감,,, 수정할 방법을 찾고싶은데 모르겠다..
-    private void saveDailySentence(User user, List<KakaoMLData> datas) {
+    private void saveDailySentence(User user, List<KakaoMLData> datas, String roomName) {
         datas.stream()
                 .forEach(data -> {
                     String time = data.getDate_time();
@@ -68,14 +68,14 @@ public class MLService {
                         Calender calender = calenderService.findCalenderByUserAndLocalDate(user, localDate);
                         String sentence = data.getText();
                         Emotion emotion = data.getEmotion();
-                        DailySentence dailySentence = new DailySentence(calender, sentence, emotion);
+                        DailySentence dailySentence = new DailySentence(calender, sentence, emotion, roomName);
                         dailySentenceRepository.save(dailySentence);
                     } catch (ParseException e) {
                         throw new RuntimeException(e);
                     }
                 });
     }
-    private void saveDailyTopic(User user, Map<String, List<String>> keyword){
+    private void saveDailyTopic(User user, Map<String, List<String>> keyword, String roomName){
         DateFormat df = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREAN);
         keyword.forEach((key, value) -> {
             try {
@@ -83,7 +83,7 @@ public class MLService {
                 LocalDate date = new java.sql.Date(parse.getTime()).toLocalDate();
                 Calender calender = calenderService.findCalenderByUserAndLocalDate(user, date);
                 value.forEach(topic -> {
-                    DailyTopic dailyTopic = new DailyTopic(calender, topic);
+                    DailyTopic dailyTopic = new DailyTopic(calender, topic, roomName);
                     dailyTopicRepository.save(dailyTopic);
                 });
             } catch (ParseException e) {
