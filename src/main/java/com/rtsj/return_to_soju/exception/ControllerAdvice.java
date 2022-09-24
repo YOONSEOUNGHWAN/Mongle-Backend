@@ -18,6 +18,7 @@ public class ControllerAdvice {
             WebClientResponseException.class,
             NotFoundUserException.class,
             NoDataUploadedException.class,
+            NotFoundCalenderException.class,
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ErrorResponseResult exceptionHandler(HttpServletRequest request, Exception e) {

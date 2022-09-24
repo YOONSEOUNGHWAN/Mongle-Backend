@@ -31,9 +31,10 @@ public class DailySentence extends BaseEntity {
     @JoinColumn(name="kakao_id")
     private KakaoText kakaoText;
 
-    public DailySentence(Calender calender, String sentence, Emotion emotion) {
+    public DailySentence(Calender calender, String sentence, Emotion emotion, String roomName) {
         this.calender = calender;
         this.sentence = sentence;
         this.emotion = emotion;
+        this.roomName = roomName;
     }
 }
