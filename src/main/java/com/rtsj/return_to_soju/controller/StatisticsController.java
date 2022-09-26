@@ -1,5 +1,6 @@
 package com.rtsj.return_to_soju.controller;
 
+import com.rtsj.return_to_soju.common.JwtProvider;
 import com.rtsj.return_to_soju.common.SuccessResponseResult;
 import com.rtsj.return_to_soju.model.dto.response.SuccessResponseDto;
 import com.rtsj.return_to_soju.model.dto.response.statistics.EmotionScoreByMonthDto;
@@ -16,7 +17,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 
 @Tag(name="Statistics Controller")
 @RestController
@@ -25,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class StatisticsController {
 
     private final StatisticsService statisticsService;
+    private final JwtProvider jwtProvider;
 
     @Operation(
             summary = "일년 기준 감정 점수 가져오기",
@@ -62,8 +68,14 @@ public class StatisticsController {
                     content = @Content(schema = @Schema(implementation = EmotionScoreByWeekDto.class)))
     })
     @GetMapping("/statistics/week")
-    public ResponseEntity<SuccessResponseResult> getWeekStatistics() {
-        EmotionScoreByWeekDto result = statisticsService.getWeekStatistics();
+    public ResponseEntity<SuccessResponseResult> getWeekStatistics(HttpServletRequest request,
+                                                                   @NotNull @RequestParam("year") Integer year,
+                                                                   @NotNull @RequestParam("month") Integer month,
+                                                                   @NotNull @RequestParam("week") Integer week) {
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        EmotionScoreByWeekDto result = statisticsService.getWeekStatistics(userId, year, month, week);
+
+        return ResponseEntity.ok(new SuccessResponseResult(result));
     }
 
 

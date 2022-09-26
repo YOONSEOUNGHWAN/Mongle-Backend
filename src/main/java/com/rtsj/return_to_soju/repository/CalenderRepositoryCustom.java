@@ -1,6 +1,11 @@
 package com.rtsj.return_to_soju.repository;
 
-public interface CalenderRepositoryCustom {
+import com.rtsj.return_to_soju.model.dto.dto.EmotionCntWithDate;
+import com.rtsj.return_to_soju.model.entity.User;
 
-//    getEmotionStatisticsWithPeriod(Integer period);
+import java.time.LocalDate;
+import java.util.List;
+
+public interface CalenderRepositoryCustom {
+    List<EmotionCntWithDate> getEmotionStatisticsWithPeriod(long userId, LocalDate startDate, LocalDate endDate);
 }
