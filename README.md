@@ -19,6 +19,7 @@ https://mongle-dev-s3.s3.ap-northeast-2.amazonaws.com/images/%E1%84%8C%E1%85%AE%
 | Test      | - JUnit 5                                                                       |
 | Infra     | - Docker <br>- AWS EC2 <br>- Git action <br>                                    |
 | Database  | - MySql                                                                         |
+| ML        | - KOTE (Korean Online That-gul Emotions) Dataset, KoGPT (Korean Generative Pre-trained Transformer)|
 
 ### Android
 
