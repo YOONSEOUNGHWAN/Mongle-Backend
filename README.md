@@ -5,6 +5,10 @@
 ## 사용 영상 📱
 https://mongle-dev-s3.s3.ap-northeast-2.amazonaws.com/images/%E1%84%8C%E1%85%AE%E1%86%BC%E1%84%80%E1%85%A1%E1%86%AB%E1%84%87%E1%85%A1%E1%86%AF%E1%84%91%E1%85%AD%E1%84%89%E1%85%B5%E1%84%92%E1%85%A7%E1%86%AB%E1%84%8B%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A1%E1%86%BC.mp4
 
+## 앱 테스크 플로우 📱
+<img width="1175" alt="image" src="https://user-images.githubusercontent.com/79346586/193742423-e4a04137-1944-4a2e-ba98-f51b60a5dcb7.png">
+
+
 ## 사용 기술 🛠️
 
 ### Back-end
