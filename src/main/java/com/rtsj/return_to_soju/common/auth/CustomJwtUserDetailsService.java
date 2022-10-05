@@ -17,6 +17,13 @@ import java.util.Optional;
 @Transactional
 public class CustomJwtUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
+
+    /**
+     * 에러처리하기
+     * @param userId the username identifying the user whose data is required.
+     * @return
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         User user = userRepository.findById(Long.parseLong(userId)).orElseThrow(NotFoundUserException::new);

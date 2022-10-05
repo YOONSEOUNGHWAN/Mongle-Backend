@@ -52,7 +52,7 @@ public class S3Service {
         files.stream()
                 .forEach(file -> {
                     String kakaoRoomName;
-                    kakaoRoomName = file.getName();
+                    kakaoRoomName = file.getOriginalFilename();
                     String fileName = dirname + "/" + prefix + kakaoRoomName + "-" + UUID.randomUUID() + suffix;
                     try (InputStream inputStream = checkDuplicateFile(file, user)) {
                         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -89,7 +89,7 @@ public class S3Service {
     }
 
     private InputStream checkDuplicateFile(MultipartFile file, User user) throws IOException, ParseException {
-        String roomName = file.getName();
+        String roomName = file.getOriginalFilename();
         List<String> collect = user.getRoomList().stream().map(KakaoRoom::getRoomName).collect(Collectors.toList());
         // 중복 된 파일
         if(collect.contains(roomName)){
@@ -119,7 +119,7 @@ public class S3Service {
     }
     private String convertStringToLocalDateKorean(String data) throws ParseException {
         SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd", Locale.KOREAN);
-        SimpleDateFormat newDtFormat = new SimpleDateFormat("yyyy년 M월 dd일", Locale.KOREAN);
+        SimpleDateFormat newDtFormat = new SimpleDateFormat("yyyy년 M월 d일", Locale.KOREAN);
         Date parse = dtFormat.parse(data);
         String format = newDtFormat.format(parse);
         return format;
