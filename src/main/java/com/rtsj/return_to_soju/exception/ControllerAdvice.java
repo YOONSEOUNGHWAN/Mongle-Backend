@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 public class ControllerAdvice {
     @ExceptionHandler({
             DuplicateSignInException.class,
-            IllegalArgumentException.class,
+//            IllegalArgumentException.class,
             WebClientResponseException.class,
             NotFoundUserException.class,
             NoDataUploadedException.class,
@@ -43,5 +43,13 @@ public class ControllerAdvice {
                 .get(0)
                 .getDefaultMessage();
         return new ErrorResponseResult(errorMessage);
+    }
+
+    @ExceptionHandler(
+            InvalidWeekException.class
+    )
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponseResult internalServerError(HttpServletRequest request, Exception e) {
+        return new ErrorResponseResult(e);
     }
 }

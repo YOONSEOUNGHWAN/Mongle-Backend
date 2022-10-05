@@ -1,22 +1,36 @@
 package com.rtsj.return_to_soju.controller;
 
+import com.rtsj.return_to_soju.common.JwtProvider;
+import com.rtsj.return_to_soju.common.SuccessResponseResult;
+import com.rtsj.return_to_soju.model.dto.response.SuccessResponseDto;
 import com.rtsj.return_to_soju.model.dto.response.statistics.EmotionScoreByMonthDto;
 import com.rtsj.return_to_soju.model.dto.response.statistics.EmotionScoreByWeekDto;
 import com.rtsj.return_to_soju.model.dto.response.statistics.EmotionScoreByYearDto;
+import com.rtsj.return_to_soju.service.StatisticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 
 @Tag(name="Statistics Controller")
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class StatisticsController {
+
+    private final StatisticsService statisticsService;
+    private final JwtProvider jwtProvider;
 
     @Operation(
             summary = "일년 기준 감정 점수 가져오기",
@@ -54,8 +68,14 @@ public class StatisticsController {
                     content = @Content(schema = @Schema(implementation = EmotionScoreByWeekDto.class)))
     })
     @GetMapping("/statistics/week")
-    public void getWeekStatistics() {
+    public ResponseEntity<SuccessResponseResult> getWeekStatistics(HttpServletRequest request,
+                                                                   @NotNull @RequestParam("year") Integer year,
+                                                                   @NotNull @RequestParam("month") Integer month,
+                                                                   @NotNull @RequestParam("week") Integer week) {
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        EmotionScoreByWeekDto result = statisticsService.getWeekStatistics(userId, year, month, week);
 
+        return ResponseEntity.ok(new SuccessResponseResult(result));
     }
 
 
