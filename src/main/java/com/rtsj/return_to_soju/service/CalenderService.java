@@ -131,4 +131,11 @@ public class CalenderService {
         Calender calender = this.findCalenderByUserAndLocalDate(user, localDate);
         return new CalenderByDayDto(calender);
     }
+
+    @Transactional
+    public void changeEmotionByUserAndDate(Long userId, String year, String month, String day, Emotion emotion){
+        LocalDate localDate = this.createLocalDateWithString(year, month, day);
+        Calender calenderByUserIdAndLocalDate = calenderRepository.findCalenderByUserIdAndLocalDate(userId, localDate);
+        calenderByUserIdAndLocalDate.setEmotion(emotion);
+    }
 }

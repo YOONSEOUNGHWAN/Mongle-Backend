@@ -3,6 +3,7 @@ package com.rtsj.return_to_soju.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.rtsj.return_to_soju.model.dto.dto.EmotionCntWithDate;
+import com.rtsj.return_to_soju.model.entity.Calender;
 import com.rtsj.return_to_soju.model.entity.QCalender;
 import com.rtsj.return_to_soju.model.entity.QUser;
 import com.rtsj.return_to_soju.model.entity.User;
@@ -38,5 +39,10 @@ public class CalenderRepositoryImpl implements CalenderRepositoryCustom {
                 .where(calender.date.between(startDate,endDate))
                 .fetch();
     }
-
+    @Override
+    public Calender findCalenderByUserIdAndLocalDate(Long userId, LocalDate date) {
+        return queryFactory.selectFrom(calender)
+                .where(calender.user.id.eq(userId).and(calender.date.eq(date)))
+                .fetchOne();
+    }
 }
