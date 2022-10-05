@@ -52,13 +52,8 @@ public class S3Service {
         files.stream()
                 .forEach(file -> {
                     String kakaoRoomName;
-                    try {
-                        kakaoRoomName = getKakaoRoomName(file);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    kakaoRoomName = file.getName();
                     String fileName = dirname + "/" + prefix + kakaoRoomName + "-" + UUID.randomUUID() + suffix;
-
                     try (InputStream inputStream = checkDuplicateFile(file, user)) {
                         ObjectMetadata objectMetadata = new ObjectMetadata();
                         objectMetadata.setContentType(file.getContentType());
@@ -77,14 +72,14 @@ public class S3Service {
         return fileNameList;
     }
 
-    private String getKakaoRoomName(MultipartFile file) throws IOException {
-        InputStream inputStream = file.getInputStream();
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-        String data = br.readLine();
-        String roomName = data.split(target)[0].strip();
-        br.close();
-        return roomName;
-    }
+//    private String getKakaoRoomName(MultipartFile file) throws IOException {
+//        InputStream inputStream = file.getInputStream();
+//        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+//        String data = br.readLine();
+//        String roomName = data.split(target)[0].strip();
+//        br.close();
+//        return roomName;
+//    }
 
     private void deleteDailySentenceAndTopicByDateAndRoom(User user, String date, String roomName) throws ParseException {
         LocalDate localDate = convertStringToLocalDate(date);
@@ -94,12 +89,7 @@ public class S3Service {
     }
 
     private InputStream checkDuplicateFile(MultipartFile file, User user) throws IOException, ParseException {
-        String roomName = getKakaoRoomName(file);
-//        boolean b = user.getRoomList().stream().anyMatch(room -> room.getRoomName().equals(roomName));
-        if(user.getRoomList().isEmpty()){
-            System.out.println("roomName = " + roomName);
-            return file.getInputStream();
-        }
+        String roomName = file.getName();
         List<String> collect = user.getRoomList().stream().map(KakaoRoom::getRoomName).collect(Collectors.toList());
         // 중복 된 파일
         if(collect.contains(roomName)){

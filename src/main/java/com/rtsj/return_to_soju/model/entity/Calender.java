@@ -67,7 +67,9 @@ public class Calender extends BaseEntity {
         else throw new IllegalArgumentException("잘못된 입력입니다.");
     }
 
-
+    public void setEmotion(Emotion emotion) {
+        this.emotion = emotion;
+    }
 
     public void writeOrUpdateDiary(String diary) {
         this.diary = diary;
