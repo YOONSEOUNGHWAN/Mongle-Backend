@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface CalenderRepository extends JpaRepository<Calender, Long> {
+public interface CalenderRepository extends JpaRepository<Calender, Long>, CalenderRepositoryCustom {
     Optional<Calender> findByUserAndDate(User user, LocalDate date);
     List<Calender> findALLByUserAndDateBetween(User user, LocalDate start, LocalDate end);
     void deleteAllByDate(LocalDate date);
