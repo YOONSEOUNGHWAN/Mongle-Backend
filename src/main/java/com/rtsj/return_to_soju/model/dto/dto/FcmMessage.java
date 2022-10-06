@@ -19,7 +19,6 @@ public class FcmMessage {
         private Notification notification; //mobile os
         private String token; //특정 디바이스 보내는 경우
         private FcmTypeAndData data;
-        private String type;
     }
 
     @Builder
