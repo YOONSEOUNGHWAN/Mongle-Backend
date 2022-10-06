@@ -6,8 +6,8 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.*;
-import com.rtsj.return_to_soju.model.dto.dto.FcmAnalyzeDate;
 import com.rtsj.return_to_soju.model.dto.dto.FcmMessage;
+import com.rtsj.return_to_soju.model.dto.dto.FcmTypeAndData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -77,9 +77,19 @@ public class FirebaseCloudMessageService{
 
     public void sendMessageTo(String targetToken, String title, String body) throws IOException{
         OkHttpClient client = new OkHttpClient();
+        log.info("알림을 전송합니다.");
         String message = makeMessage(targetToken, title, body);
         sendMessage(client, message);
     }
+
+    public void sendErrorMessageTo(String targetToken, String title, String body) throws IOException{
+        OkHttpClient client = new OkHttpClient();
+        log.info("알림을 전송합니다.");
+        String message = makeErrorMessage(targetToken, title, body);
+        sendMessage(client, message);
+    }
+
+
     public void sendAnalyzeMessageTo(String targetToken, String title, String body, String date) throws IOException{
         OkHttpClient client = new OkHttpClient();
         log.info("분석 알림을 발송합니다.");
@@ -99,8 +109,6 @@ public class FirebaseCloudMessageService{
                 .execute();
         log.info(response.body().string());
     }
-
-
     private String makeMessage(String targetToken, String title, String body) throws JsonProcessingException {
         FcmMessage fcmMessage = FcmMessage.builder()
                 .message(FcmMessage.Message.builder()
@@ -118,6 +126,24 @@ public class FirebaseCloudMessageService{
                 .build();
         return objectMapper.writeValueAsString(fcmMessage);
     }
+    private String makeErrorMessage(String targetToken, String title, String body) throws JsonProcessingException {
+        FcmMessage fcmMessage = FcmMessage.builder()
+                .message(FcmMessage.Message.builder()
+                        .token(targetToken)
+                        .notification(
+                                FcmMessage.Notification.builder()
+                                        .title(title)
+                                        .body(body)
+                                        .image(null)
+                                        .build()
+                        )
+                        .data(new FcmTypeAndData("error","전송 실패"))
+                        .build()
+                )
+                .validate_only(false)
+                .build();
+        return objectMapper.writeValueAsString(fcmMessage);
+    }
     private String makeAnalyzeMessage(String targetToken, String title, String body, String date) throws JsonProcessingException {
         FcmMessage fcmMessage = FcmMessage.builder()
                 .message(FcmMessage.Message.builder()
@@ -129,7 +155,7 @@ public class FirebaseCloudMessageService{
                                         .image(null)
                                         .build()
                         )
-                        .data(new FcmAnalyzeDate("analyze",date))
+                        .data(new FcmTypeAndData("analyze",date))
                         .build()
                 )
                 .validate_only(false)
