@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ import javax.validation.constraints.NotNull;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Slf4j
 public class StatisticsController {
 
     private final StatisticsService statisticsService;
@@ -50,12 +52,15 @@ public class StatisticsController {
             description = "현재를 기준으로 1주 간격으로 총 4주 간의 감정 점수를 조회하는 api"
     )
     @ApiResponses(value = {
-                    @ApiResponse(responseCode = "200", description = "요청 성공",
+            @ApiResponse(responseCode = "200", description = "요청 성공",
                     content = @Content(schema = @Schema(implementation = EmotionScoreByMonthDto.class)))
-            })
+    })
     @GetMapping("/statistics/month")
-    public void getMonthStatistics() {
-
+    public void getMonthStatistics(HttpServletRequest request,
+                                   @NotNull @RequestParam("year") Integer year,
+                                   @NotNull @RequestParam("month") Integer month) {
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        EmotionScoreByMonthDto result = statisticsService.getMonthStatistics(userId, year, month);
     }
 
 
@@ -73,8 +78,9 @@ public class StatisticsController {
                                                                    @NotNull @RequestParam("month") Integer month,
                                                                    @NotNull @RequestParam("week") Integer week) {
         Long userId = jwtProvider.getUserIdByHeader(request);
+        log.info(userId + "유저 주 기준 감정 통계 api 호출");
         EmotionScoreByWeekDto result = statisticsService.getWeekStatistics(userId, year, month, week);
-
+        log.info(userId + "유저 주 기준 감정 통계 api 응답");
         return ResponseEntity.ok(new SuccessResponseResult(result));
     }
 

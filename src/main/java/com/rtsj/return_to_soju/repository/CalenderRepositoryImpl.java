@@ -35,9 +35,10 @@ public class CalenderRepositoryImpl implements CalenderRepositoryCustom {
                         calender.sad
                 )).from(calender)
                 .orderBy(calender.date.asc())
-                .join(user).on(user.id.eq(userId))
-                .where(calender.date.between(startDate,endDate))
+                .where(calender.date.between(startDate, endDate), calender.user.id.eq(userId))
                 .fetch();
+
+
     }
     @Override
     public Calender findCalenderByUserIdAndLocalDate(Long userId, LocalDate date) {
