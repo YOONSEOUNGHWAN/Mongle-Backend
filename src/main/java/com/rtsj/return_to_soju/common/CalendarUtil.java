@@ -3,9 +3,15 @@ package com.rtsj.return_to_soju.common;
 import com.rtsj.return_to_soju.exception.InvalidWeekException;
 import org.springframework.stereotype.Component;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 @Component
 public class CalendarUtil {
@@ -17,9 +23,9 @@ public class CalendarUtil {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.YEAR, year);
         cal.set(Calendar.MONTH, month - 1);
-
         return cal.getActualMaximum(Calendar.DAY_OF_MONTH);
     }
+
 
 
     /**
@@ -107,5 +113,82 @@ public class CalendarUtil {
 //
 //    }
 
+    /**
+     *
+     * @param stringDate YYYY년 MM월 dd일 a HH:mm
+     * @return LocalDate
+     * @throws ParseException
+     */
+    public LocalDate convertKoreanStringWithDayToLocalDate(String stringDate) {
+        try{
+            DateFormat df = new SimpleDateFormat("yyyy년 MM월 dd일 a HH:mm", Locale.KOREAN);
+            Date parse = df.parse(stringDate);
+            LocalDate localDate = new java.sql.Date(parse.getTime()).toLocalDate();
+            return localDate;
+        }catch (ParseException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     *
+     * @param stringDate YYYY년 MM월 dd일
+     * @return LocalDate
+     */
+    public LocalDate convertKoreanStringToLocalDate(String stringDate) {
+        try{
+            DateFormat df = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREAN);
+            Date parse = df.parse(stringDate);
+            LocalDate localDate = new java.sql.Date(parse.getTime()).toLocalDate();
+            return localDate;
+        }catch (ParseException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    /**
+     * @param year
+     * @param month
+     * @param day
+     * @return LocalDate
+     */
+    public LocalDate createLocalDateWithYearMonthDay(String year, String month, String day) {
+        String date = year + "-" + month + "-" + day;
+        return LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
+    }
+
+    /**
+     * @param data yyyyMMdd
+     * @return YYYY년 M월 D일
+     */
+    public String convertStringToLocalDateStringKorean(String data) {
+        try{
+            SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd", Locale.KOREAN);
+            SimpleDateFormat newDtFormat = new SimpleDateFormat("yyyy년 M월 d일", Locale.KOREAN);
+            Date parse = dtFormat.parse(data);
+            String format = newDtFormat.format(parse);
+            return format;
+        }catch (ParseException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     *
+     * @param data yyyyMMdd
+     * @return LocalDate
+     */
+    public LocalDate convertStringToLocalDate(String data) {
+        try{
+            SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd", Locale.KOREAN);
+            Date parse = dtFormat.parse(data);
+            LocalDate localDate = new java.sql.Date(parse.getTime()).toLocalDate();
+            return localDate;
+        }catch (ParseException e){
+            throw new RuntimeException(e);
+        }
+
+    }
 
 }

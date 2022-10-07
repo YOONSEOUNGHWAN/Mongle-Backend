@@ -17,6 +17,12 @@ import java.util.Optional;
 public class KakaoRoomService {
     private final KakaoRoomRepository kakaoRoomRepository;
 
+    /**
+     *
+     * @param user
+     * @param roomName
+     * @param endDate : YYYYMMDD
+     */
     @Transactional
     public void saveOrUpdateKakaoRoom(User user, String roomName, String endDate){
         Optional<KakaoRoom> optionalKakaoRoom = kakaoRoomRepository.findByUserAndRoomName(user, roomName);
