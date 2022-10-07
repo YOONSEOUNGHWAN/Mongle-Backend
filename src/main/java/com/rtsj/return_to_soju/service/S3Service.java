@@ -72,15 +72,6 @@ public class S3Service {
         return fileNameList;
     }
 
-//    private String getKakaoRoomName(MultipartFile file) throws IOException {
-//        InputStream inputStream = file.getInputStream();
-//        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-//        String data = br.readLine();
-//        String roomName = data.split(target)[0].strip();
-//        br.close();
-//        return roomName;
-//    }
-
     private void deleteDailySentenceAndTopicByDateAndRoom(User user, String date, String roomName) throws ParseException {
         LocalDate localDate = convertStringToLocalDate(date);
         Calender calender = calenderRepository.findByUserAndDate(user, localDate).orElseThrow(NotFoundCalenderException::new);

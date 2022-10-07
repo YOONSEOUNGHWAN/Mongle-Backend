@@ -24,15 +24,13 @@ public class StatisticsService {
     private final UserRepository userRepository;
 
     public EmotionScoreByWeekDto getWeekStatistics(Long userId, int year, int month, int week) {
-        int[] startEndDay = getStartEndDay(year, month, week);
+        int[] startEndDay = this.getStartEndDay(year, month, week);
         LocalDate startDate = LocalDate.of(year, month, startEndDay[0]);
         LocalDate endDate = LocalDate.of(year, month, startEndDay[1]);
 
         log.info(startDate +"부터 " + endDate +"까지의 감정 점수 가져오기");
         List<EmotionCntWithDate> emotionCntWithDateList = calenderRepository.getEmotionStatisticsWithPeriod(userId, startDate, endDate);
-
         return new EmotionScoreByWeekDto(emotionCntWithDateList);
-
     }
 
     private int[] getStartEndDay(int year, int month, int target) {
@@ -71,7 +69,5 @@ public class StatisticsService {
 
         throw new InvalidWeekException("적절하지 않은 주가 입력되었습니다. 최승용에게 연락 바랍니다");
     }
-
-
 
 }

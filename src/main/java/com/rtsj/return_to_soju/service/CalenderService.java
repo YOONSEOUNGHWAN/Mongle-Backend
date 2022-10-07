@@ -133,12 +133,9 @@ public class CalenderService {
     }
 
     @Transactional
-    /**
-     * 변경감지 안 돼.
-     */
     public void changeEmotionByUserAndDate(Long userId, String year, String month, String day, Emotion emotion){
         LocalDate localDate = this.createLocalDateWithString(year, month, day);
         Calender calenderByUserIdAndLocalDate = calenderRepository.findCalenderByUserIdAndLocalDate(userId, localDate);
-        calenderByUserIdAndLocalDate.setEmotion(emotion);
+        calenderByUserIdAndLocalDate.updateEmotion(emotion);
     }
 }

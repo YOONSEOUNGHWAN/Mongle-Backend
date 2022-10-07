@@ -5,8 +5,10 @@ import com.rtsj.return_to_soju.model.enums.Emotion;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.security.cert.TrustAnchor;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +17,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicUpdate
 public class Calender extends BaseEntity {
     @Id
     @GeneratedValue
@@ -26,6 +29,7 @@ public class Calender extends BaseEntity {
     private LocalDate date;
     @Enumerated(EnumType.STRING)
     private Emotion emotion;
+    private Boolean emotionUpdate = false;
     @Lob
     private String diary;
     private String diaryFeedback;
@@ -74,8 +78,9 @@ public class Calender extends BaseEntity {
         else throw new IllegalArgumentException("잘못된 입력입니다.");
     }
 
-    public void setEmotion(Emotion emotion) {
+    public void updateEmotion(Emotion emotion) {
         this.emotion = emotion;
+        this.emotionUpdate = Boolean.TRUE;
     }
 
     public void writeOrUpdateDiary(String diary) {
@@ -84,7 +89,6 @@ public class Calender extends BaseEntity {
     public void writeOrUpdateDiaryFeedback(String diaryFeedback) {
         this.diaryFeedback = diaryFeedback;
     }
-
     public void addTopic(DailyTopic dailyTopic) {
         this.topicList.add(dailyTopic);
     }
