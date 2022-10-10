@@ -20,7 +20,8 @@ public class DailySentence extends BaseEntity {
     @JoinColumn(name = "calender_id")
     private Calender calender;
 
-    @Lob
+//    @Lob //너무 큼
+    @Column(columnDefinition = "TEXT") // 65535문자
     private String sentence;
     @Enumerated(EnumType.STRING)
     private Emotion emotion;

@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.rtsj.return_to_soju.common.CalendarUtil;
 import com.rtsj.return_to_soju.exception.NotFoundCalenderException;
 import com.rtsj.return_to_soju.exception.NotFoundUserException;
 import com.rtsj.return_to_soju.model.entity.Calender;
@@ -44,7 +45,7 @@ public class S3Service {
     private final DailyTopicRepository dailyTopicRepository;
 
     private final String target = "카카오톡 대화";
-
+    private final CalendarUtil calendarUtil;
 
     private List<String> uploadFile(List<MultipartFile> files, String prefix, String dirname, String suffix, User user) {
         log.info("S3 파일올리는 로직 시작");
@@ -52,13 +53,8 @@ public class S3Service {
         files.stream()
                 .forEach(file -> {
                     String kakaoRoomName;
-                    try {
-                        kakaoRoomName = getKakaoRoomName(file);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    kakaoRoomName = file.getOriginalFilename();
                     String fileName = dirname + "/" + prefix + kakaoRoomName + "-" + UUID.randomUUID() + suffix;
-
                     try (InputStream inputStream = checkDuplicateFile(file, user)) {
                         ObjectMetadata objectMetadata = new ObjectMetadata();
                         objectMetadata.setContentType(file.getContentType());
@@ -67,45 +63,28 @@ public class S3Service {
                                 .withCannedAcl(CannedAccessControlList.PublicRead));
                     } catch (IOException e) {
                         throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
-                    } catch (ParseException e) {
-                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
                     }
-
                     fileNameList.add(fileName);
                 });
         log.info("S3 파일올리는 로직 완료");
         return fileNameList;
     }
 
-    private String getKakaoRoomName(MultipartFile file) throws IOException {
-        InputStream inputStream = file.getInputStream();
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-        String data = br.readLine();
-        String roomName = data.split(target)[0].strip();
-        br.close();
-        return roomName;
-    }
-
-    private void deleteDailySentenceAndTopicByDateAndRoom(User user, String date, String roomName) throws ParseException {
-        LocalDate localDate = convertStringToLocalDate(date);
+    private void deleteDailySentenceAndTopicByDateAndRoom(User user, String date, String roomName) {
+        LocalDate localDate = calendarUtil.convertStringToLocalDate(date);
         Calender calender = calenderRepository.findByUserAndDate(user, localDate).orElseThrow(NotFoundCalenderException::new);
         dailyTopicRepository.deleteAllByCalenderAndRoomName(calender, roomName);
         dailySentenceRepository.deleteAllByCalenderAndRoomName(calender, roomName);
     }
 
-    private InputStream checkDuplicateFile(MultipartFile file, User user) throws IOException, ParseException {
-        String roomName = getKakaoRoomName(file);
-//        boolean b = user.getRoomList().stream().anyMatch(room -> room.getRoomName().equals(roomName));
-        if(user.getRoomList().isEmpty()){
-            System.out.println("roomName = " + roomName);
-            return file.getInputStream();
-        }
+    private InputStream checkDuplicateFile(MultipartFile file, User user) throws IOException {
+        String roomName = file.getOriginalFilename();
         List<String> collect = user.getRoomList().stream().map(KakaoRoom::getRoomName).collect(Collectors.toList());
         // 중복 된 파일
         if(collect.contains(roomName)){
             int i = collect.indexOf(roomName);
             KakaoRoom kakaoRoom = user.getRoomList().get(i);
-            String lastDateTime = convertStringToLocalDateKorean(kakaoRoom.getLastDateTime());
+            String lastDateTime = calendarUtil.convertStringToLocalDateStringKorean(kakaoRoom.getLastDateTime());
             InputStream inputStream = file.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             String line;
@@ -127,21 +106,6 @@ public class S3Service {
         }
         return file.getInputStream();
     }
-    private String convertStringToLocalDateKorean(String data) throws ParseException {
-        SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd", Locale.KOREAN);
-        SimpleDateFormat newDtFormat = new SimpleDateFormat("yyyy년 M월 dd일", Locale.KOREAN);
-        Date parse = dtFormat.parse(data);
-        String format = newDtFormat.format(parse);
-        return format;
-    }
-
-    private LocalDate convertStringToLocalDate(String data) throws ParseException {
-        SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd", Locale.KOREAN);
-        Date parse = dtFormat.parse(data);
-        LocalDate localDate = new java.sql.Date(parse.getTime()).toLocalDate();
-        return localDate;
-    }
-
 
     //Todo
     // 1. 카카오서버에 요청해서 닉네임 업데이트하기
