@@ -16,7 +16,7 @@ public class KakaoMLDataSaveRequestDto {
     private List<KakaoMLData> kakao_data;
     private String start_date;
     private String end_date;
-    private Map<String, List<String>> keyword = new HashMap<>();
+    private Map<String, List<String>> keyword;
     private String roomName;
 
 }
