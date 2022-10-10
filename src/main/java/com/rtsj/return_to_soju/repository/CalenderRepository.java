@@ -12,9 +12,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface CalenderRepository extends JpaRepository<Calender, Long> {
+public interface CalenderRepository extends JpaRepository<Calender, Long>, CalenderRepositoryCustom {
     Optional<Calender> findByUserAndDate(User user, LocalDate date);
     List<Calender> findALLByUserAndDateBetween(User user, LocalDate start, LocalDate end);
+    void deleteAllByDate(LocalDate date);
+
     @Modifying
     @Query(value = "" +
             "update calender c " +
@@ -55,5 +57,28 @@ public interface CalenderRepository extends JpaRepository<Calender, Long> {
                     "(select * from (select c3.calender_id from calender c3 join rtuser r on c3.user_id = r.user_id where r.user_id =:userId) as a)",
             nativeQuery = true)
     int saveCalenderMainEmotionByNativeQuery(@Param("userId") Long userId);
+
+    @Modifying
+    @Query(value =
+        "insert into week_statistics " +
+                "(year_week, happy, neutral, angry, anxious, sad, tired, score, user_id) " +
+                "SELECT " +
+                "DATE_FORMAT(date, '%x/%v') AS `week`," +
+                "sum(happy) as 'happy', " +
+                "sum(neutral) as 'neutral', " +
+                "sum(angry) as 'angry', " +
+                "sum(anxious) as 'anxious', " +
+                "sum(sad) as 'sad', " +
+                "sum(tired) as 'tired', " +
+                "getScore(sum(happy),sum(neutral),sum(angry),sum(anxious),sum(sad),sum(tired)) as score, " +
+                ":userId " +
+                "FROM calender " +
+                "where user_id = :userId " +
+                "GROUP BY week " +
+                "order by week",
+            nativeQuery = true
+    )
+    int saveWeekStatisticsByNativeQuery(@Param("userId") Long userId);
+
 
 }

@@ -132,4 +132,17 @@ public class CalenderController {
         return ResponseEntity.ok()
                 .body(sentenceByEmotionWithDay);
     }
+    @PatchMapping("/calender/{year}/{month}/{day}/emotion")
+    public ResponseEntity<SuccessResponseResult> changeEmotionByUserAndDate(
+            @PathVariable(name = "year") String year,
+            @PathVariable(name = "month") String month,
+            @PathVariable(name = "day") String day,
+            @RequestParam("value") Emotion emotion,
+            HttpServletRequest request
+    ){
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        calenderService.changeEmotionByUserAndDate(userId, year, month, day, emotion);
+        return ResponseEntity.ok()
+                .body(new SuccessResponseResult("변경 완료!"));
+    }
 }
