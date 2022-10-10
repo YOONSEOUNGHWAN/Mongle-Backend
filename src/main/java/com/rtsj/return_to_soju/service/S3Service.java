@@ -90,7 +90,7 @@ public class S3Service {
             String line;
             String memory = "";
             while((line=br.readLine())!=null){
-                if(line.contains(lastDateTime)){
+                if(line.startsWith(lastDateTime)){
                     memory += line+'\n';
                     break;
                 }
