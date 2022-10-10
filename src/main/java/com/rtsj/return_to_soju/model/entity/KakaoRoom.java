@@ -32,4 +32,8 @@ public class KakaoRoom extends BaseEntity{
         this.roomName = roomName;
         this.lastDateTime = lastDateTime;
     }
+
+    public void updateLastDateTime(String lastDateTime){
+        this.lastDateTime = lastDateTime;
+    }
 }
