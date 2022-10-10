@@ -46,6 +46,7 @@ public interface CalenderRepository extends JpaRepository<Calender, Long>, Calen
                     "set c1.emotion = " +
                     "case " +
                         "(select * from (select greatest(c2.angry, c2.anxious, c2.happy, c2.neutral, c2.sad, c2.tired) from calender c2 where c2.calender_id = c1.calender_id) as a) " +
+                    "when 0 then null " +
                     "when c1.happy then 'HAPPY' " +
                     "when c1.neutral then 'NEUTRAL' " +
                     "when c1.anxious then 'ANXIOUS' " +
