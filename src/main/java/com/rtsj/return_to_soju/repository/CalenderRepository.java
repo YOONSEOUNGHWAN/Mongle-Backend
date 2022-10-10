@@ -54,7 +54,8 @@ public interface CalenderRepository extends JpaRepository<Calender, Long>, Calen
                     "when c1.tired then 'TIRED' " +
                     "end " +
                     "where c1.calender_id in " +
-                    "(select * from (select c3.calender_id from calender c3 join rtuser r on c3.user_id = r.user_id where r.user_id =:userId) as a)",
+                    "(select * from (select c3.calender_id from calender c3 join rtuser r on c3.user_id = r.user_id where r.user_id =:userId) as a)" +
+                    "and c1.emotion_update=false",
             nativeQuery = true)
     int saveCalenderMainEmotionByNativeQuery(@Param("userId") Long userId);
 
