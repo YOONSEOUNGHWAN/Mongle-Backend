@@ -51,7 +51,7 @@ public class MLService {
         kakaoRoomService.saveOrUpdateKakaoRoom(user, dto.getRoomName(), dto.getEnd_date());
         calenderRepository.saveCalenderEmotionCntByNatvieQuery(userId);
         calenderRepository.saveCalenderMainEmotionByNativeQuery(userId);
-        calenderRepository.saveWeekStatisticsByNativeQuery(userId);
+//        calenderRepository.saveWeekStatisticsByNativeQuery(userId);
     }
 
 
