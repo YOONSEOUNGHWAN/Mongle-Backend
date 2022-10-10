@@ -12,15 +12,6 @@ public class EmotionScoreWithDayDto {
     private Float score;
     private LocalDate date;
 
-    /**
-     * happy : 5
-     * neutral : 0
-     * angry : 1
-     * anxious : 2
-     * tired : 2
-     * sad : 1
-     */
-
     @JsonIgnore
     private final int happyScore = 5;
     @JsonIgnore
