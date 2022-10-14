@@ -62,23 +62,29 @@ public interface CalenderRepository extends JpaRepository<Calender, Long>, Calen
 
     @Modifying
     @Query(value =
-        "insert into week_statistics " +
-                "(year_week, happy, neutral, angry, anxious, sad, tired, score, user_id) " +
-                "SELECT " +
-                "DATE_FORMAT(date, '%x/%v') AS `week`," +
-                "sum(happy) as 'happy', " +
-                "sum(neutral) as 'neutral', " +
-                "sum(angry) as 'angry', " +
-                "sum(anxious) as 'anxious', " +
-                "sum(sad) as 'sad', " +
-                "sum(tired) as 'tired', " +
-                "getScore(sum(happy),sum(neutral),sum(angry),sum(anxious),sum(sad),sum(tired)) as score, " +
-                ":userId " +
-                "FROM calender " +
-                "where user_id = :userId " +
-                "GROUP BY week " +
-                "order by week",
-            nativeQuery = true
+            "insert into week_statistics " +
+                    "(year_week, happy, neutral, angry, anxious, sad, tired, score, user_id) " +
+                    "select week, happy, neutral, angry, anxious, sad, tired, score, user_id " +
+                    "from " +
+                    "(SELECT DATE_FORMAT(date, '%x/%v') AS `week`," +
+                    "sum(happy) as 'happy'," +
+                    "sum(neutral) as 'neutral'," +
+                    "sum(angry) as 'angry'," +
+                    "sum(anxious) as 'anxious'," +
+                    "sum(sad) as 'sad', " +
+                    "sum(tired) as 'tired', " +
+                    "getScore(sum(happy),sum(neutral),sum(angry),sum(anxious),sum(sad),sum(tired)) as score, " +
+                    ":userId as 'user_id' " +
+                    "FROM calender where user_id = :userId GROUP BY week order by week) sub_query " +
+                    "on duplicate key update " +
+                    "happy=sub_query.happy, " +
+                    "neutral = sub_query.neutral, " +
+                    "angry = sub_query.angry, " +
+                    "anxious = sub_query.anxious, " +
+                    "sad = sub_query.sad, " +
+                    "tired = sub_query.tired, " +
+                    "score = sub_query.score;",
+            nativeQuery= true
     )
     int saveWeekStatisticsByNativeQuery(@Param("userId") Long userId);
 

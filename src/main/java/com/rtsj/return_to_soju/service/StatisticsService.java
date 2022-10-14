@@ -42,9 +42,9 @@ public class StatisticsService {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = LocalDate.of(year, month, calendarUtil.getMonthEndDay(year, month));
 
-        List<EmotionCntWithDate> emotionStatisticsWithPeriod = calenderRepository.getEmotionStatisticsWithPeriod(userId, startDate, endDate);
+//        List<EmotionCntWithDate> emotionStatisticsWithPeriod = calenderRepository.getEmotionStatisticsWithPeriod(userId, startDate, endDate);
 //        calendarUtil.
-        return new EmotionScoreByMonthDto(emotionStatisticsWithPeriod);
+//        return new EmotionScoreByMonthDto(emotionStatisticsWithPeriod);
     }
 
 
