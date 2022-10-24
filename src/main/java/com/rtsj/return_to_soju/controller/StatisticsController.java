@@ -3,9 +3,10 @@ package com.rtsj.return_to_soju.controller;
 import com.rtsj.return_to_soju.common.JwtProvider;
 import com.rtsj.return_to_soju.common.SuccessResponseResult;
 import com.rtsj.return_to_soju.model.dto.response.SuccessResponseDto;
-import com.rtsj.return_to_soju.model.dto.response.statistics.EmotionScoreByMonthDto;
 import com.rtsj.return_to_soju.model.dto.response.statistics.EmotionScoreByWeekDto;
 import com.rtsj.return_to_soju.model.dto.response.statistics.EmotionScoreByYearDto;
+import com.rtsj.return_to_soju.model.dto.response.statistics.StatisticsResponseDto;
+import com.rtsj.return_to_soju.model.entity.WeekStatistics.WeekStatistics;
 import com.rtsj.return_to_soju.service.StatisticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Tag(name="Statistics Controller")
 @RestController
@@ -39,12 +41,16 @@ public class StatisticsController {
             description = "현재를 기준으로 1년전까지의 감정 점수를 월별로 조회하는 api"
     )
     @ApiResponses(value = {
-                    @ApiResponse(responseCode = "200", description = "요청 성공",
+            @ApiResponse(responseCode = "200", description = "요청 성공",
                     content = @Content(schema = @Schema(implementation = EmotionScoreByYearDto.class)))
-            })
+    })
     @GetMapping("/statistics/year")
-    public void getYearStatistics() {
+    public ResponseEntity<SuccessResponseResult> getYearStatistics(HttpServletRequest request,
+                                  @NotNull @RequestParam("year") Integer year) {
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        StatisticsResponseDto result = statisticsService.getYearStatistics(userId, year);
 
+        return ResponseEntity.ok(new SuccessResponseResult(result));
     }
 
     @Operation(
@@ -53,14 +59,16 @@ public class StatisticsController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "요청 성공",
-                    content = @Content(schema = @Schema(implementation = EmotionScoreByMonthDto.class)))
+                    content = @Content(schema = @Schema(implementation = StatisticsResponseDto.class)))
     })
     @GetMapping("/statistics/month")
-    public void getMonthStatistics(HttpServletRequest request,
+    public ResponseEntity<SuccessResponseResult> getMonthStatistics(HttpServletRequest request,
                                    @NotNull @RequestParam("year") Integer year,
                                    @NotNull @RequestParam("month") Integer month) {
         Long userId = jwtProvider.getUserIdByHeader(request);
-        EmotionScoreByMonthDto result = statisticsService.getMonthStatistics(userId, year, month);
+        StatisticsResponseDto result = statisticsService.getMonthStatistics(userId, year, month);
+
+        return ResponseEntity.ok(new SuccessResponseResult(result));
     }
 
 
@@ -85,8 +93,4 @@ public class StatisticsController {
     }
 
 
-//    @GetMapping("/statistics/{year}/{month}/{week}")
-//    public void getWeekStatistics(@PathVariable("year") String year, @PathVariable("month") String month, @PathVariable("week") String week) {
-//
-//    }
 }

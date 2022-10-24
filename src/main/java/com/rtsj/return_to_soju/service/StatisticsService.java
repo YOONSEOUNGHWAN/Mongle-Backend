@@ -3,10 +3,12 @@ package com.rtsj.return_to_soju.service;
 import com.rtsj.return_to_soju.common.CalendarUtil;
 import com.rtsj.return_to_soju.exception.InvalidWeekException;
 import com.rtsj.return_to_soju.model.dto.dto.EmotionCntWithDate;
-import com.rtsj.return_to_soju.model.dto.response.statistics.EmotionScoreByMonthDto;
 import com.rtsj.return_to_soju.model.dto.response.statistics.EmotionScoreByWeekDto;
+import com.rtsj.return_to_soju.model.dto.response.statistics.StatisticsResponseDto;
+import com.rtsj.return_to_soju.model.entity.WeekStatistics.WeekStatistics;
 import com.rtsj.return_to_soju.repository.CalenderRepository;
 import com.rtsj.return_to_soju.repository.UserRepository;
+import com.rtsj.return_to_soju.repository.WeekStatisticsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class StatisticsService {
 
     private final UserRepository userRepository;
     private final CalendarUtil calendarUtil;
+    private final WeekStatisticsRepository weekStatisticsRepository;
 
     public EmotionScoreByWeekDto getWeekStatistics(Long userId, int year, int month, int week) {
         LocalDate[] startEndDate = calendarUtil.findWeekWithYearAndMonth(year, month, week);
@@ -38,15 +41,22 @@ public class StatisticsService {
 
     }
 
-    public EmotionScoreByMonthDto getMonthStatistics(Long userId, Integer year, Integer month) {
-        LocalDate startDate = LocalDate.of(year, month, 1);
-        LocalDate endDate = LocalDate.of(year, month, calendarUtil.getMonthEndDay(year, month));
+    public StatisticsResponseDto getMonthStatistics(Long userId, Integer year, Integer month) {
+        int firstWeekInMonth = calendarUtil.getFirstWeekInMonth(year, month);
+        int lastWeekInMonth = calendarUtil.getLastWeekInMonth(year, month);
+        String startWeek = year + "/" + firstWeekInMonth;
+        String lastWeek = year + "/" + lastWeekInMonth;
 
-        List<EmotionCntWithDate> emotionStatisticsWithPeriod = calenderRepository.getEmotionStatisticsWithPeriod(userId, startDate, endDate);
-//        calendarUtil.
-        return new EmotionScoreByMonthDto(emotionStatisticsWithPeriod);
+        List<WeekStatistics> result = weekStatisticsRepository.findWeekStatisticsWithStartAndEndWeek(userId, startWeek, lastWeek);
+
+        return StatisticsResponseDto.byMonth(result, year, month, firstWeekInMonth, lastWeekInMonth);
     }
 
 
+    public StatisticsResponseDto getYearStatistics(Long userId, Integer year) {
+        List<WeekStatistics> result = weekStatisticsRepository.findWeekStatisticsWithYear(userId, String.valueOf(year));
 
+        return StatisticsResponseDto.byYear(result, year);
+
+    }
 }
