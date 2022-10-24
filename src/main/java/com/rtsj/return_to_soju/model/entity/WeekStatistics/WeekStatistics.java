@@ -23,4 +23,10 @@ public class WeekStatistics {
     private Integer sad;
 
     private Float score;
+
+    public int getWeek(){
+        String yearWeek = id.getYearWeek();
+        return Integer.parseInt(yearWeek.split("/")[1]);
+    }
+
 }

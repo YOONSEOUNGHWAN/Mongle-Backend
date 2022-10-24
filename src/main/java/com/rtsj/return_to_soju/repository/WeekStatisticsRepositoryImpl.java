@@ -22,9 +22,17 @@ public class WeekStatisticsRepositoryImpl implements WeekStatisticsRepositoryCus
     public List<WeekStatistics> findWeekStatisticsWithStartAndEndWeek(Long userId, String startWeek, String endWeek) {
         return queryFactory.selectFrom(weekStatistics)
                 .where(weekStatistics.id.user.id.eq(userId)
-//                        .and(weekStatistics.id.yearWeek.goe(startWeek))
-//                        .and(weekStatistics.id.yearWeek.loe(endWeek)))
                         .and(weekStatistics.id.yearWeek.between(startWeek, endWeek)))
+                .orderBy(weekStatistics.id.yearWeek.asc())
+                .fetch();
+    }
+
+    @Override
+    public List<WeekStatistics> findWeekStatisticsWithYear(Long userId, String year) {
+
+        return queryFactory.selectFrom(weekStatistics)
+                .where(weekStatistics.id.user.id.eq(userId)
+                        .and(weekStatistics.id.yearWeek.contains(year)))
                 .orderBy(weekStatistics.id.yearWeek.asc())
                 .fetch();
     }
