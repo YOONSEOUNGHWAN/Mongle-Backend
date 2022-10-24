@@ -4,10 +4,14 @@ import com.rtsj.return_to_soju.common.CalendarUtil;
 import com.rtsj.return_to_soju.model.dto.dto.EmotionCntWithDate;
 import com.rtsj.return_to_soju.model.entity.WeekStatistics.WeekStatistics;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 @Data
+@NoArgsConstructor
 public class StatisticsResponseDto {
     Float[] scoreList;
     String startDate;
@@ -18,30 +22,68 @@ public class StatisticsResponseDto {
     private int tired = 0;
     private int sad = 0;
 
-    public StatisticsResponseDto(List<WeekStatistics> result, int year, int month, int startWeek, int lastWeek) {
+    public static StatisticsResponseDto byMonth(List<WeekStatistics> result, int year, int month, int startWeek, int lastWeek) {
         CalendarUtil calendarUtil = new CalendarUtil();
 
-        int totalWeek = lastWeek - startWeek + 1;
-        scoreList = new Float[totalWeek];
+        StatisticsResponseDto dto = new StatisticsResponseDto();
 
-        startDate = calendarUtil.getFirstDateWithYearMonth(year, month).toString();
+        int totalWeek = lastWeek - startWeek + 1;
+        dto.scoreList = new Float[totalWeek];
+
+        dto.startDate = calendarUtil.getFirstDateWithYearMonth(year, month).toString();
 
         for (WeekStatistics weekStatistics : result) {
-            int yearWeek = getWeek(weekStatistics.getId().getYearWeek());
+            int yearWeek = weekStatistics.getWeek();
             int monthWeek = calendarUtil.getMonthWeekWithYearWeek(year,yearWeek);
 
-            scoreList[monthWeek-1] = weekStatistics.getScore();
+            dto.scoreList[monthWeek-1] = weekStatistics.getScore();
 
-            happy += weekStatistics.getHappy();
-            neutral += weekStatistics.getNeutral();
-            angry += weekStatistics.getAngry();
-            anxious += weekStatistics.getAnxious();
-            tired += weekStatistics.getTired();
-            sad += weekStatistics.getSad();
+            dto.addEmotionCtn(weekStatistics);
         }
+        return dto;
     }
-    private int getWeek(String yearWeek){
-        String[] token = yearWeek.split("/");
-        return Integer.parseInt(token[1]);
+
+    private void addEmotionCtn(WeekStatistics weekStatistics) {
+        happy += weekStatistics.getHappy();
+        neutral += weekStatistics.getNeutral();
+        angry += weekStatistics.getAngry();
+        anxious += weekStatistics.getAnxious();
+        tired += weekStatistics.getTired();
+        sad += weekStatistics.getSad();
     }
+
+    public static StatisticsResponseDto byYear(List<WeekStatistics> result, int year) {
+        CalendarUtil calendarUtil = new CalendarUtil();
+        StatisticsResponseDto dto = new StatisticsResponseDto();
+        dto.scoreList = new Float[12];
+
+        dto.startDate = calendarUtil.getFirstDateWithYearMonth(year, 1).toString();
+
+        Queue<WeekStatistics> queue = new LinkedList<>();
+        queue.addAll(result);
+
+        for (int i = 1; i < 12; i++) {
+            int lastWeekInMonth = calendarUtil.getLastWeekInMonth(year, i);
+            float score = 0;
+            int scoreCnt = 0;
+            while (!queue.isEmpty() && queue.peek().getWeek() <= lastWeekInMonth) {
+                WeekStatistics each = queue.poll();
+                if (each.getScore() == null)
+                    continue;
+                score += each.getScore();
+                scoreCnt++;
+
+                dto.addEmotionCtn(each);
+            }
+
+            if (scoreCnt != 0) {
+                dto.scoreList[i - 1] = score / scoreCnt;
+            }
+
+        }
+
+        return dto;
+    }
+
+
 }

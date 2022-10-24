@@ -49,9 +49,14 @@ public class StatisticsService {
 
         List<WeekStatistics> result = weekStatisticsRepository.findWeekStatisticsWithStartAndEndWeek(userId, startWeek, lastWeek);
 
-        return new StatisticsResponseDto(result, year, month, firstWeekInMonth, lastWeekInMonth);
+        return StatisticsResponseDto.byMonth(result, year, month, firstWeekInMonth, lastWeekInMonth);
     }
 
 
+    public StatisticsResponseDto getYearStatistics(Long userId, Integer year) {
+        List<WeekStatistics> result = weekStatisticsRepository.findWeekStatisticsWithYear(userId, String.valueOf(year));
 
+        return StatisticsResponseDto.byYear(result, year);
+
+    }
 }

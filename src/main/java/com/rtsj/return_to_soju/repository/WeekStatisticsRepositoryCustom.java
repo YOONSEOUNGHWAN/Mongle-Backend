@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface WeekStatisticsRepositoryCustom {
     public List<WeekStatistics> findWeekStatisticsWithStartAndEndWeek(Long userId, String startWeek, String endWeek);
+
+    public List<WeekStatistics> findWeekStatisticsWithYear(Long userId, String year);
 }

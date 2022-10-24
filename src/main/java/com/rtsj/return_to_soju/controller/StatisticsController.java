@@ -41,12 +41,16 @@ public class StatisticsController {
             description = "현재를 기준으로 1년전까지의 감정 점수를 월별로 조회하는 api"
     )
     @ApiResponses(value = {
-                    @ApiResponse(responseCode = "200", description = "요청 성공",
+            @ApiResponse(responseCode = "200", description = "요청 성공",
                     content = @Content(schema = @Schema(implementation = EmotionScoreByYearDto.class)))
-            })
+    })
     @GetMapping("/statistics/year")
-    public void getYearStatistics() {
+    public ResponseEntity<SuccessResponseResult> getYearStatistics(HttpServletRequest request,
+                                  @NotNull @RequestParam("year") Integer year) {
+        Long userId = jwtProvider.getUserIdByHeader(request);
+        StatisticsResponseDto result = statisticsService.getYearStatistics(userId, year);
 
+        return ResponseEntity.ok(new SuccessResponseResult(result));
     }
 
     @Operation(
@@ -89,8 +93,4 @@ public class StatisticsController {
     }
 
 
-//    @GetMapping("/statistics/{year}/{month}/{week}")
-//    public void getWeekStatistics(@PathVariable("year") String year, @PathVariable("month") String month, @PathVariable("week") String week) {
-//
-//    }
 }
