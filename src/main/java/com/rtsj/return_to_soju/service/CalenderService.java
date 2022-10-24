@@ -80,9 +80,12 @@ public class CalenderService {
     private String getDiaryFeedbackFromMLServer(String diary) throws WebClientResponseException, IOException, ParseException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-        String urlParam = chatbotURL+diary;
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("sentence", diary);
+        RequestBody requestBody = RequestBody.create(jsonObject.toString(), MediaType.get("application/json; charset=utf-8"));
         Request request = new Request.Builder()
-                .url(urlParam)
+                .url(chatbotURL)
+                .post(requestBody)
                 .build();
         Response response = client.newCall(request).execute();
         String string = response.body().string();
