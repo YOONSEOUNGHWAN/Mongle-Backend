@@ -101,7 +101,6 @@ public class CalenderController {
         Long userId = jwtProvider.getUserIdByHeader(request);
         String diaryText = dto.getText();
         calenderService.createDiary(userId, year, month, day, diaryText);
-
         String uri = "/calender/" + year + "/" + month + "/" + day + "/diary";
         return ResponseEntity
                 .created(URI.create(uri))
