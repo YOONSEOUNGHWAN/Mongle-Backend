@@ -89,13 +89,19 @@ public class UserService {
         user.setFcmToken(fcmToken);
     }
 
-//    public void updateUserNickName(User user, KakaoTokenDto kakaoToken){
-//        ReissueTokenResponseDto reissueTokenResponseDto = oauthService.renewKakaoToken(kakaoToken.getRefreshToken());
-//        KakaoUserInfo kakaoUserInfoWithToken = oauthService.getKakaoUserInfoWithToken(kakaoToken);
-//        user.
-//        Long userId = kakaoUserInfo.getId();
-//        String nickName = kakaoUserInfo.getNickName();
-//    }
+    public void updateUserNickName(User user, KakaoTokenDto kakaoToken){
+        log.info("유저 토큰 재발급");
+        ReissueTokenResponseDto reissueTokenResponseDto = oauthService.renewKakaoToken(kakaoToken.getRefreshToken());
+        kakaoToken.setAccessToken(reissueTokenResponseDto.getAccessToken());
+        if(reissueTokenResponseDto.getRefreshToken() != null){
+            log.info("유저 리프레쉬 토큰 재발급");
+            kakaoToken.setRefreshToken(reissueTokenResponseDto.getRefreshToken());
+        }
+        KakaoUserInfo kakaoUserInfo = oauthService.getKakaoUserInfoWithToken(kakaoToken);
+        user.updateKakaoName(kakaoUserInfo.getNickName());
+        user.updateKakaoToken(kakaoToken);
+        log.info("유저 닉네임 업데이트");
+    }
 
 
 }
