@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.rtsj.return_to_soju.common.CalendarUtil;
 import com.rtsj.return_to_soju.exception.NotFoundUserException;
+import com.rtsj.return_to_soju.model.dto.dto.MLChatbotDto;
+import com.rtsj.return_to_soju.model.dto.request.WriteDiaryDto;
 import com.rtsj.return_to_soju.model.dto.response.CalenderBetweenMonthResponseDto;
 import com.rtsj.return_to_soju.model.dto.response.CalenderByDayDto;
 import com.rtsj.return_to_soju.model.dto.response.SentenceByEmotionWithDayDto;
@@ -67,21 +69,26 @@ public class CalenderService {
     }
 
     @Transactional
-    public void createDiary(Long userId, String year, String month, String day, String diaryText) throws IOException, ParseException {
+    public void createDiary(Long userId, String year, String month, String day, WriteDiaryDto data) throws IOException, ParseException {
         LocalDate localDate = calendarUtil.createLocalDateWithYearMonthDay(year, month, day);
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
         Calender calender = findCalenderByUserAndLocalDate(user, localDate);
-        String diaryFeedbackFromMLServer = getDiaryFeedbackFromMLServer(diaryText);
-        calender.writeOrUpdateDiary(diaryText);
-        calender.writeOrUpdateDiaryFeedback(diaryFeedbackFromMLServer);
+
+        MLChatbotDto diaryFeedbackFromMLServer = getDiaryFeedbackFromMLServer(data);
+
+        calender.writeOrUpdateDiary(diaryFeedbackFromMLServer.getEncrypt());
+        calender.writeOrUpdateDiaryFeedback(diaryFeedbackFromMLServer.getAnswer());
+
         calenderRepository.save(calender);
     }
 
-    private String getDiaryFeedbackFromMLServer(String diary) throws WebClientResponseException, IOException, ParseException {
+
+    private MLChatbotDto getDiaryFeedbackFromMLServer(WriteDiaryDto data) throws WebClientResponseException, IOException, ParseException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("sentence", diary);
+        jsonObject.put("sentence", data.getText());
+        jsonObject.put("key", data.getKey());
         RequestBody requestBody = RequestBody.create(jsonObject.toString(), MediaType.get("application/json; charset=utf-8"));
         Request request = new Request.Builder()
                 .url(chatbotURL)
@@ -91,7 +98,11 @@ public class CalenderService {
         String string = response.body().string();
         JSONParser jsonParser = new JSONParser();
         JSONObject parse = (JSONObject) jsonParser.parse(string);
-        return parse.get("answer").toString();
+
+        String answer = parse.get("answer").toString();
+        String encrypt = parse.get("encrypt").toString();
+
+        return new MLChatbotDto(answer, encrypt);
     }
 
 
