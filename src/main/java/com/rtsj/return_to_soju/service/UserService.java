@@ -5,6 +5,7 @@ import com.rtsj.return_to_soju.exception.NotFoundUserException;
 import com.rtsj.return_to_soju.model.dto.dto.KakaoTokenDto;
 import com.rtsj.return_to_soju.model.dto.dto.KakaoUserInfo;
 import com.rtsj.return_to_soju.model.dto.response.LoginResponseDto;
+import com.rtsj.return_to_soju.model.dto.response.ReissueTokenResponseDto;
 import com.rtsj.return_to_soju.model.dto.response.UserInfoResponseDto;
 import com.rtsj.return_to_soju.model.entity.User;
 import com.rtsj.return_to_soju.model.enums.Role;
@@ -86,6 +87,15 @@ public class UserService {
     public void SaveUserFcmToken(Long userId, String fcmToken){
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
         user.setFcmToken(fcmToken);
-        return;
     }
+
+//    public void updateUserNickName(User user, KakaoTokenDto kakaoToken){
+//        ReissueTokenResponseDto reissueTokenResponseDto = oauthService.renewKakaoToken(kakaoToken.getRefreshToken());
+//        KakaoUserInfo kakaoUserInfoWithToken = oauthService.getKakaoUserInfoWithToken(kakaoToken);
+//        user.
+//        Long userId = kakaoUserInfo.getId();
+//        String nickName = kakaoUserInfo.getNickName();
+//    }
+
+
 }

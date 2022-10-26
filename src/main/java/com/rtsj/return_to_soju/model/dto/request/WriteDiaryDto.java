@@ -8,4 +8,7 @@ public class WriteDiaryDto {
 
     @Schema(description = "일기", example = "오늘은 날씨가 참 밝다. ^^")
     private String text;
+
+    @Schema(description = "암호", example = "32byte의 암호")
+    private String key;
 }
