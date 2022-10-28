@@ -89,8 +89,9 @@ public class UserService {
         user.setFcmToken(fcmToken);
     }
 
-    public void updateUserNickName(User user, KakaoTokenDto kakaoToken){
+    public void updateUserKakaoNickName(User user){
         log.info("유저 토큰 재발급");
+        KakaoTokenDto kakaoToken = user.getKakaoToken();
         ReissueTokenResponseDto reissueTokenResponseDto = oauthService.renewKakaoToken(kakaoToken.getRefreshToken());
         kakaoToken.setAccessToken(reissueTokenResponseDto.getAccessToken());
         if(reissueTokenResponseDto.getRefreshToken() != null){

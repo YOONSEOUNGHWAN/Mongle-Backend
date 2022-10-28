@@ -115,8 +115,7 @@ public class S3Service {
         // 이 에러가 발생할 확률이 사실상 없지만 만약 발생하게 된다면 400번으로 나가는데 이게 옳을까..?
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
 
-        KakaoTokenDto kakaoToken = user.getKakaoToken();
-        userService.updateUserNickName(user, kakaoToken);
+        userService.updateUserKakaoNickName(user);
 
         String prefix = user.getId() + "-" + user.getKakaoName() + "-";
 
