@@ -103,6 +103,11 @@ public class UserService {
         user.updateKakaoToken(kakaoToken);
         log.info("유저 닉네임 업데이트");
     }
-
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
+        userRepository.delete(user);
+        return;
+    }
 
 }
