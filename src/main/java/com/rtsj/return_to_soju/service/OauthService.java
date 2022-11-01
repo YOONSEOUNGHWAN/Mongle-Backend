@@ -93,9 +93,11 @@ public class OauthService {
         formData.add("grant_type", "refresh_token");
         formData.add("client_id", kakaoRestApiKey);
         formData.add("refresh_token", kakaoRefreshToken);
-        System.out.println(formData);
+        log.info(formData.toString());
         return formData;
     }
+
+
 
 }
 
