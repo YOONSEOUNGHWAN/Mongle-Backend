@@ -106,8 +106,8 @@ public class UserService {
     @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
-        userRepository.delete(user);
-        return;
+        String s = oauthService.unlinkUser(user);
+        userRepository.deleteById(Long.parseLong(s));
     }
 
 }
