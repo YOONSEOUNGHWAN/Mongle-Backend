@@ -88,7 +88,7 @@ public class CalenderService {
                 .build();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("sentence", data.getText());
-        jsonObject.put("key", data.getKey());
+//        jsonObject.put("key", data.getKey());
         RequestBody requestBody = RequestBody.create(jsonObject.toString(), MediaType.get("application/json; charset=utf-8"));
         Request request = new Request.Builder()
                 .url(chatbotURL)
@@ -100,9 +100,12 @@ public class CalenderService {
         JSONObject parse = (JSONObject) jsonParser.parse(string);
 
         String answer = parse.get("answer").toString();
-        String encrypt = parse.get("encrypt").toString();
+        /**
+         * todo : App Update되면 올리 것.
+         */
+//        String encrypt = parse.get("encrypt").toString();
 
-        return new MLChatbotDto(answer, encrypt);
+        return new MLChatbotDto(answer, data.getText());
     }
 
 
