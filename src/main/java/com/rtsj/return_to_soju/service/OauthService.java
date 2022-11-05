@@ -68,6 +68,7 @@ public class OauthService {
 
 
     private KakaoRenewInfo getRenewKakaoToken(String kakaoRefreshToken){
+        log.info("카카오톡 재발급");
         Map<String, Object> kakaoRenewResponse = getKakaoRenewResponse(kakaoRefreshToken);
         KakaoRenewInfo kakaoRenewInfo = new KakaoRenewInfo(kakaoRenewResponse);
         return kakaoRenewInfo;
@@ -100,6 +101,7 @@ public class OauthService {
         KakaoRenewInfo renewKakaoToken = getRenewKakaoToken(user.getKakaoRefreshToken());
         String accessToken = renewKakaoToken.getAccessToken();
         Map<String, Object> stringObjectMap = unlinkUserRequest(accessToken);
+        log.info("카카오톡 회원 탈퇴");
         return stringObjectMap.get("id").toString();
     }
 
