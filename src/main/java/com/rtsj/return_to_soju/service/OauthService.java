@@ -68,6 +68,7 @@ public class OauthService {
 
 
     private KakaoRenewInfo getRenewKakaoToken(String kakaoRefreshToken){
+        log.info("카카오톡 재발급");
         Map<String, Object> kakaoRenewResponse = getKakaoRenewResponse(kakaoRefreshToken);
         KakaoRenewInfo kakaoRenewInfo = new KakaoRenewInfo(kakaoRenewResponse);
         return kakaoRenewInfo;
@@ -96,8 +97,25 @@ public class OauthService {
         log.info(formData.toString());
         return formData;
     }
+    public String unlinkUser(User user) {
+        KakaoRenewInfo renewKakaoToken = getRenewKakaoToken(user.getKakaoRefreshToken());
+        String accessToken = renewKakaoToken.getAccessToken();
+        Map<String, Object> stringObjectMap = unlinkUserRequest(accessToken);
+        log.info("카카오톡 회원 탈퇴");
+        return stringObjectMap.get("id").toString();
+    }
 
-
-
+    private Map<String, Object> unlinkUserRequest(String accessToken) {
+        return WebClient.create()
+                .post()
+                .uri("https://kapi.kakao.com/v1/user/unlink")
+                .headers(httpHeaders -> {
+                    httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                    httpHeaders.setBearerAuth(accessToken);
+                })
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                .block();
+    }
 }
 
