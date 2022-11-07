@@ -44,8 +44,12 @@ public class CalenderService {
     private final CalenderRepository calenderRepository;
     private final UserRepository userRepository;
     private final DailySentenceRepository dailySentenceRepository;
+    @Value("${mongle.ml.chatbot.encrypt.url}")
+    public String Encrypt_URL;
+
     @Value("${mongle.ml.chatbot.url}")
-    public String chatbotURL;
+    public String Plain_URL;
+
 
     private final CalendarUtil calendarUtil;
     @Transactional //User의 정보를 가져오는데 사용됨.. 추가로, UserRepository에서 캘린더를 빼오면 어떨까... 성능측면에서는 비슷해 보이는뎅..
@@ -73,17 +77,22 @@ public class CalenderService {
         LocalDate localDate = calendarUtil.createLocalDateWithYearMonthDay(year, month, day);
         User user = userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
         Calender calender = findCalenderByUserAndLocalDate(user, localDate);
-
-        MLChatbotDto diaryFeedbackFromMLServer = getDiaryFeedbackFromMLServer(data);
-
-        calender.writeOrUpdateDiary(diaryFeedbackFromMLServer.getEncrypt());
-        calender.writeOrUpdateDiaryFeedback(diaryFeedbackFromMLServer.getAnswer());
+        /**
+         * data.key가 NULL일 경우, 다른 URI로 전송한다.
+         */
+        MLChatbotDto diaryFeedBack;
+        if(data.getKey() == null){
+            diaryFeedBack = getDiaryFeedbackFromPlain(data);
+        }else{
+            diaryFeedBack = getDiaryFeedbackFromEncrypt(data);
+        }
+        calender.writeOrUpdateDiary(diaryFeedBack.getText());
+        calender.writeOrUpdateDiaryFeedback(diaryFeedBack.getAnswer());
 
         calenderRepository.save(calender);
     }
 
-
-    private MLChatbotDto getDiaryFeedbackFromMLServer(WriteDiaryDto data) throws WebClientResponseException, IOException, ParseException {
+    private MLChatbotDto getDiaryFeedbackFromEncrypt(WriteDiaryDto data) throws WebClientResponseException, IOException, ParseException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         JSONObject jsonObject = new JSONObject();
@@ -91,7 +100,7 @@ public class CalenderService {
 //        jsonObject.put("key", data.getKey());
         RequestBody requestBody = RequestBody.create(jsonObject.toString(), MediaType.get("application/json; charset=utf-8"));
         Request request = new Request.Builder()
-                .url(chatbotURL)
+                .url(Encrypt_URL)
                 .post(requestBody)
                 .build();
         Response response = client.newCall(request).execute();
@@ -104,6 +113,26 @@ public class CalenderService {
          * todo : App Update되면 올리 것.
          */
 //        String encrypt = parse.get("encrypt").toString();
+
+        return new MLChatbotDto(answer, data.getText());
+    }
+
+    private MLChatbotDto getDiaryFeedbackFromPlain(WriteDiaryDto data) throws WebClientResponseException, IOException, ParseException {
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("sentence", data.getText());
+        RequestBody requestBody = RequestBody.create(jsonObject.toString(), MediaType.get("application/json; charset=utf-8"));
+        Request request = new Request.Builder()
+                .url(Plain_URL)
+                .post(requestBody)
+                .build();
+        Response response = client.newCall(request).execute();
+        String string = response.body().string();
+        JSONParser jsonParser = new JSONParser();
+        JSONObject parse = (JSONObject) jsonParser.parse(string);
+
+        String answer = parse.get("answer").toString();
 
         return new MLChatbotDto(answer, data.getText());
     }
