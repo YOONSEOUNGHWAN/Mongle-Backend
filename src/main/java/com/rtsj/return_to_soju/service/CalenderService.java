@@ -44,7 +44,7 @@ public class CalenderService {
     private final CalenderRepository calenderRepository;
     private final UserRepository userRepository;
     private final DailySentenceRepository dailySentenceRepository;
-    @Value("${mongle.ml.chatbot.url}")
+    @Value("${mongle.ml.chatbog.encrypt.url}")
     public String chatbotURL;
 
     private final CalendarUtil calendarUtil;
@@ -88,7 +88,7 @@ public class CalenderService {
                 .build();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("sentence", data.getText());
-//        jsonObject.put("key", data.getKey());
+        jsonObject.put("key", data.getKey());
         RequestBody requestBody = RequestBody.create(jsonObject.toString(), MediaType.get("application/json; charset=utf-8"));
         Request request = new Request.Builder()
                 .url(chatbotURL)
@@ -100,12 +100,9 @@ public class CalenderService {
         JSONObject parse = (JSONObject) jsonParser.parse(string);
 
         String answer = parse.get("answer").toString();
-        /**
-         * todo : App Update되면 올리 것.
-         */
-//        String encrypt = parse.get("encrypt").toString();
+        String encrypt = parse.get("encrypt").toString();
 
-        return new MLChatbotDto(answer, data.getText());
+        return new MLChatbotDto(answer, encrypt);
     }
 
 

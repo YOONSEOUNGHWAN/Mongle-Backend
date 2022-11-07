@@ -63,7 +63,7 @@ public class MLController {
     @PostMapping("/ml/error")
     public ResponseEntity<SuccessResponseResult> saveKakaoMLError(@RequestBody KakaoMLErrorRequestDto dto) throws IOException {
         String userFcmToken = userService.getUserFcmToken(dto.getUser_pk());
-        firebaseCloudMessageService.sendErrorMessageTo(userFcmToken, "몽글몽글", "파일 업로드에 실패했어요:(");
+        firebaseCloudMessageService.sendErrorMessageTo(userFcmToken, "몽글몽글", "분석할 데이터가 없어요 :( 다른 카톡방을 보내보세요 :)");
         return ResponseEntity.ok()
                 .body(new SuccessResponseResult("Error 메세지 전송"));
     }
