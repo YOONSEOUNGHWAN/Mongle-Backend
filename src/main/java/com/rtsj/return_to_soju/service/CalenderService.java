@@ -97,7 +97,7 @@ public class CalenderService {
                 .build();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("sentence", data.getText());
-//        jsonObject.put("key", data.getKey());
+        jsonObject.put("key", data.getKey());
         RequestBody requestBody = RequestBody.create(jsonObject.toString(), MediaType.get("application/json; charset=utf-8"));
         Request request = new Request.Builder()
                 .url(Encrypt_URL)
