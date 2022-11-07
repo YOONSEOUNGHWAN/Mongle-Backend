@@ -17,9 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleMessage {
     private final UserRepository userRepository;
-    private final UserService userService;
-
-    private final CalenderRepository calenderRepository;
     private final FirebaseCloudMessageService firebaseCloudMessageService;
     @Scheduled(cron = "0 0 21 ? * WED")
     public void pushMemoryMessage(){
