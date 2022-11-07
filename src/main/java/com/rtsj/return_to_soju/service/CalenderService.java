@@ -109,12 +109,9 @@ public class CalenderService {
         JSONObject parse = (JSONObject) jsonParser.parse(string);
 
         String answer = parse.get("answer").toString();
-        /**
-         * todo : App Update되면 올리 것.
-         */
-//        String encrypt = parse.get("encrypt").toString();
+        String encrypt = parse.get("encrypt").toString();
 
-        return new MLChatbotDto(answer, data.getText());
+        return new MLChatbotDto(answer, encrypt);
     }
 
     private MLChatbotDto getDiaryFeedbackFromPlain(WriteDiaryDto data) throws WebClientResponseException, IOException, ParseException {
