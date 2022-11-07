@@ -7,6 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class MLChatbotDto {
     private String answer;
-    private String encrypt;
+    private String text;
 }
 
