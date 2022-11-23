@@ -19,7 +19,7 @@ public class TestController {
     @GetMapping("/gift")
     public ResponseEntity<SuccessResponseDto> gift(){
         List<String> allFcmToken = userRepository.findAllFcmToken();
-        System.out.println(allFcmToken);
+//        System.out.println(allFcmToken);
         firebaseCloudMessageService.sendMessageListWithToken(allFcmToken, "몽글몽글", "행복한 기억이 도착했어요");
         return ResponseEntity.ok().body(new SuccessResponseDto("성공"));
     }
